@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - Viewing of changeset in Database-> Check Database
 
 ### Fixed
-- none
+- Changelog viewing
 
 ## [1.7.1.0] - 2025-07-31
 ### Added
