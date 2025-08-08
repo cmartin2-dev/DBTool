@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.7.2.0] - 2025-07-31
+## [1.7.2.0] - 2025-08-08
 ### Added
 - Viewing of changeset in Database-> Check Database
 
