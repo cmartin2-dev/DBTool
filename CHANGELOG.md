@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.3.0] - 2025-08-18
+### Added
+- Manual execute trigger of changeset in Check Database section
+
+### Fixed
+
+
 ## [1.7.2.0] - 2025-08-08
 ### Added
 - Viewing of changeset in Database-> Check Database
