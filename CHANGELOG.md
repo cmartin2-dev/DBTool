@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [1.7.3.0] - 2025-08-18
 ### Added
-- Manual execute trigger of changeset in Check Database section
+- Manual execute trigger of failed changesets in Check Database section.
+- Manual execute trigger of selected changeset in Check Database section.
 
 ### Fixed
-
+- Verify button - now disabled after verification. this will be enabled again once get changeset is clicked.
 
 ## [1.7.2.0] - 2025-08-08
 ### Added
