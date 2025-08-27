@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.5.0] - 2025-08-27
+### Added
+- Count in evironment list.
+- In Query per Schema tab, allow multiple environment query for SCAH only. The behavior of tab is different from others since to avoid confusion when using it.
+- Can now give multiple results in Query tab as long as it is separated by GO.
+- Tab in query has been removed upon opening the application. Ctrl+Shift+T to add a new tab.
+
+### Fixed
+- Removed button in Environment list. Automatically loads the tenant when selecting environment.
+- Adjust width of result in query.
+
 ## [1.7.4.0] - 2025-08-12
 ### Added
 - Context menu in query text box for saving queries.
