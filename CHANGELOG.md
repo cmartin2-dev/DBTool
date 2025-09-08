@@ -1,6 +1,13 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.7.6.0] - 2025-09-08
+### Added
+-Column label in ERD Object Checker.
+
+### Fixed
+-Fixed error message when querying in Query tab.
+-Fixed crashing issue when saving query in Query tab.
 
 ## [1.7.5.0] - 2025-08-27
 ### Added
