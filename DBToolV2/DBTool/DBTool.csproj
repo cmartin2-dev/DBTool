@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>support.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="support.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="support.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="support.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Connect\" />
+    <Folder Include="Controls\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DBTool\DBTool\Entities\Entities.csproj" />
+  </ItemGroup>
+
+</Project>
