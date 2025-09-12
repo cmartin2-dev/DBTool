@@ -23,11 +23,19 @@
 
   <ItemGroup>
     <Folder Include="Connect\" />
-    <Folder Include="Controls\" />
+    <Folder Include="Commons\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DBTool\DBTool\Entities\Entities.csproj" />
+    <ProjectReference Include="..\Entities\Entities.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="settings.set">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+
 
 </Project>
