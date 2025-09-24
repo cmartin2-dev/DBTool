@@ -348,6 +348,41 @@
             </Setter>
         </Style>
 
+        <Style x:Key="WatermarkTextBox" TargetType="TextBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <!-- The actual text area -->
+                            <ScrollViewer x:Name="PART_ContentHost"
+                               Margin="0"
+                               Focusable="false" />
+
+                            <!-- Watermark -->
+                            <TextBlock x:Name="Watermark"
+                            Text="{TemplateBinding Tag}"
+                            Foreground="Gray"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="Collapsed"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <!-- Show watermark when empty -->
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="Watermark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Watermark" Property="Foreground" Value="#AAA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
         <Style TargetType="MenuItem">
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
@@ -358,6 +393,53 @@
             <Setter Property="ContextMenu" Value="{StaticResource SharedListViewContextMenu}"/>
             <EventSetter Event="ContextMenuOpening" Handler="ListView_ContextMenuOpening"/>
             <EventSetter Event="PreviewMouseRightButtonDown" Handler="ListView_PreviewMouseRightButtonDown"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListView">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Background="{TemplateBinding Background}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- search bar -->
+                                    <RowDefinition Height="auto"/>
+                                    <!-- headers -->
+                                    <RowDefinition Height="*"/>
+                                    <!-- items -->
+                                </Grid.RowDefinitions>
+
+                                <!-- Search box (global for all ListViews) -->
+                                <TextBox Grid.Row="0" x:Name="SearchBox"
+                             Margin="4"
+                             Padding="4"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Center" Style="{StaticResource WatermarkTextBox}"
+                                         Tag="Type to search..."
+                             ToolTip="Type to search..." TextChanged="TextBox_TextChanged"/>
+
+                                <!-- Headers -->
+                                <GridViewHeaderRowPresenter Grid.Row="1"
+                            Columns="{Binding View.Columns, RelativeSource={RelativeSource TemplatedParent}}"/>
+
+                                <!-- Items -->
+                                <ScrollViewer Grid.Row="2"
+                                  Focusable="false">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="ItemsSource" Value="{x:Null}">
+                                <Setter TargetName="SearchBox" Property="Text" Value=""/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
+
+       
     </Application.Resources>
 </Application>
