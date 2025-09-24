@@ -18,12 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="support.ico" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Connect\" />
-    <Folder Include="Commons\" />
+    <Resource Include="support.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <None Update="settings.set">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

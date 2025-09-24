@@ -8,59 +8,313 @@ using System.Threading.Tasks;
 
 namespace Entities
 {
-    public class HeaderEnvironment : INotifyPropertyChanged
+    public class HeaderEnvironment : INotifyPropertyChanged, ICloneable
     {
 
         private string _envName = string.Empty;
-        public int Id { get; set; }
-        
-        public string EnvironmentName { get { 
-            
-                if(string.IsNullOrEmpty(_envName))
-                {
-                    _envName = TenantName; 
-                }
-                return _envName;
-            } set
+        private int _id;
+        private string _tenantName;
+        private Dictionary<string, string> _headers;
+        private string _endPoint;
+        private string _clientId;
+        private string _clientSecret;
+        private string _resource;
+        private string _tokenURL;
+        private string _username;
+        private string _password;
+        private string _token;
+        private bool _isOAuth1;
+        private SQLDBInfo _SQLDBInfo;
+        private string _defaultFSH;
+        private string _IDMTask;
+        private string _ThumbnailTask;
+
+        private string _IONAPI;
+
+        private string _TenantList;
+
+        private bool _GetDataGrowth;
+
+        private bool _isUS;
+        private bool _isEU;
+
+        public int Id
+        {
+            get { return _id; }
+
+            set
             {
-                _envName = value;
+                _id = value;
+                OnPropertyChanged(nameof(Id));
             }
         }
-        public string TenantName { get; set; }
-        public Dictionary<string, string> Headers { get; set; }
+
+        public string EnvironmentName
+        {
+            get
+            {
+
+                if (string.IsNullOrEmpty(_envName))
+                {
+                    _envName = TenantName;
+                }
+                return _envName;
+            }
+            set
+            {
+                _envName = value;
+                OnPropertyChanged(nameof(EnvironmentName));
+            }
+        }
+        public string TenantName
+        {
+            get
+            {
+                return _tenantName;
+            }
+
+            set
+            {
+                _tenantName = value;
+
+                OnPropertyChanged(nameof(TenantName));
+            }
+        }
+        public Dictionary<string, string> Headers
+        {
+            get { return _headers; }
+            set
+            {
+                _headers = value;
+
+                OnPropertyChanged(nameof(Headers));
+            }
+        }
 
 
-        public string EndPoint { get; set; }
+        public string EndPoint
+        {
+            get
+            {
+                return _endPoint;
+            }
+            set
+            {
+                _endPoint = value;
+                OnPropertyChanged(nameof(EndPoint));
+            }
+        }
 
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string Resource { get; set; }
+        public string ClientId
+        {
+            get
+            {
+                return _clientId;
+            }
+            set
+            {
+                _clientId = value;
+                OnPropertyChanged(nameof(ClientId));
+            }
+        }
+        public string ClientSecret
+        {
+            get
+            {
+                return _clientSecret;
+            }
+            set
+            {
+                _clientSecret = value;
+                OnPropertyChanged(nameof(ClientSecret));
+            }
+        }
+        public string Resource
+        {
+            get
+            {
+                return _resource;
+            }
+            set
+            {
+                _resource = value;
+                OnPropertyChanged(nameof(Resource));
+            }
+        }
 
-        public string TokenUrl { get; set; }
+        public string TokenUrl
+        {
+            get
+            {
+                return _tokenURL;
+            }
+            set
+            {
+                _tokenURL = value;
+                OnPropertyChanged(nameof(TokenUrl));
+            }
+        }
 
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string Username
+        {
+            get
+            {
+                return _username;
+            }
+            set
+            {
+                _username = value;
+                OnPropertyChanged(nameof(Username));
+            }
+        }
+        public string Password
+        {
+            get
+            {
+                return _password;
+            }
+            set
+            {
+                _password = value;
+                OnPropertyChanged(nameof(Password));
+            }
+        }
 
-        public string Token { get; set; }
+        public string Token
+        {
+            get
+            {
+                return _token;
+            }
+            set
+            {
+                _token = value;
+                OnPropertyChanged(nameof(Token));
+            }
+        }
 
 
-        public bool isOAuth1 { get; set; }
+        public bool isOAuth1
+        {
+            get
+            {
+                return _isOAuth1;
+            }
+            set
+            {
+                _isOAuth1 = value;
+                OnPropertyChanged(nameof(isOAuth1));
+            }
+        }
 
-        public SQLDBInfo SQLDBInfo { get; set; }
+        public SQLDBInfo SQLDBInfo
+        {
+            get
+            { return _SQLDBInfo; }
+            set
+            {
+                _SQLDBInfo = value;
+                OnPropertyChanged(nameof(SQLDBInfo));
+            }
+        }
 
-        public string DefaultFSH { get; set; }
+        public string DefaultFSH
+        {
+            get
+            { return _defaultFSH; }
+            set
+            {
+                _defaultFSH = value;
+                OnPropertyChanged(nameof(DefaultFSH));
+            }
+        }
 
-        public string IDMTask { get; set; }
-        public string ThumbnailTask { get; set; }
+        public string IDMTask
+        {
+            get
+            { return _IDMTask; }
+            set
+            {
+                _IDMTask = value;
+                OnPropertyChanged(nameof(IDMTask));
+            }
+        }
+        public string ThumbnailTask
+        {
+            get
+            {
+                return _ThumbnailTask;
+            }
+            set
+            {
+                _ThumbnailTask = value;
+                OnPropertyChanged(nameof(ThumbnailTask));
+            }
+        }
 
-        public string IONAPI { get; set; }
+        public string IONAPI
+        {
 
-        public string TenantList { get; set; }
+            get
+            {
+                return _IONAPI;
+            }
+            set
+            {
+                _IONAPI = value;
+                OnPropertyChanged(nameof(IONAPI));
+            }
+        }
 
-        public bool GetDataGrowth { get; set; }
+        public string TenantList
+        {
+            get
+            { return _TenantList; }
+            set
+            {
+                _TenantList = value;
+                OnPropertyChanged(nameof(TenantList));
+            }
+        }
 
-        public bool isUS { get; set; }
-        public bool isEU { get; set; }
+        public bool GetDataGrowth
+        {
+            get
+            {
+                return _GetDataGrowth;
+            }
+            set
+            {
+                _GetDataGrowth = value;
+                OnPropertyChanged(nameof(GetDataGrowth));
+            }
+        }
+
+        public bool isUS
+        {
+
+            get
+            {
+                return _isUS;
+            }
+            set
+            {
+                _isUS = value;
+                OnPropertyChanged(nameof(isUS));
+            }
+        }
+        public bool isEU
+        {
+            get
+            {
+                return _isEU;
+            }
+            set
+            {
+                _isEU = value;
+                OnPropertyChanged(nameof(isEU));
+            }
+        }
 
 
         public HeaderEnvironment()
@@ -86,11 +340,13 @@ namespace Entities
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public void InvokePropertyChanged(PropertyChangedEventArgs e)
+
+        public object Clone()
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, e);
+            return MemberwiseClone();
         }
     }
 }
