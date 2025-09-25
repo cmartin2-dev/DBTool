@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="CUSTOMTSQL.xshd" />
     <None Remove="support.ico" />
   </ItemGroup>
 
@@ -18,6 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="CUSTOMTSQL.xshd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
   </ItemGroup>

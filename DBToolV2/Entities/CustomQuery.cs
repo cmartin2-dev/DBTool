@@ -15,5 +15,9 @@ namespace Entities
         public IDictionary<string, object> Fields { get; set; }
 
         public List<CustomObject> Objects { get; set; }
+
+
+        public int RowsAffected { get; set; }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DBTool.Commons;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
@@ -151,6 +152,17 @@ namespace DBTool
             };
 
             view.Refresh();
+        }
+
+
+        private void Export_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void cmExportExcel_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

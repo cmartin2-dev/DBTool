@@ -23,6 +23,7 @@ namespace Entities
         private int noOfProcess;
         private bool isFullAccess;
         private string excludedKeys;
+        private bool checkAccess;
 
         public string Server
         {
@@ -112,7 +113,8 @@ namespace Entities
                 OnPropertyChanged(nameof(UpgradePath));
             }
         }
-        public int NoOfProcess {
+        public int NoOfProcess
+        {
             get
             {
                 return noOfProcess;
@@ -120,7 +122,7 @@ namespace Entities
             set
             {
                 noOfProcess = value;
-              //  OnPropertyChanged(nameof(NoOfProcess));
+                //  OnPropertyChanged(nameof(NoOfProcess));
             }
         }
         public bool IsFullAccess
@@ -132,7 +134,23 @@ namespace Entities
             set
             {
                 isFullAccess = value;
-              //  OnPropertyChanged(nameof(IsFullAccess));
+                OnPropertyChanged(nameof(IsFullAccess));
+
+
+            }
+        }
+
+        [JsonIgnore]
+        public bool CheckAccess
+        {
+            get
+            {
+                return checkAccess;
+            }
+            set
+            {
+                checkAccess = value;
+                OnPropertyChanged(nameof(CheckAccess));
             }
         }
 
@@ -145,7 +163,7 @@ namespace Entities
             set
             {
                 excludedKeys = value;
-              //  OnPropertyChanged(nameof(ExcludedKeys));
+                //  OnPropertyChanged(nameof(ExcludedKeys));
             }
         }
 
@@ -255,9 +273,13 @@ namespace Entities
 
         public void SaveSettings()
         {
-            string jsonStr = JsonConvert.SerializeObject(this);
+            string jsonStr = JsonConvert.SerializeObject(this);            
             File.WriteAllText("settings.set", jsonStr);
+        }
+
+        public string RetStr()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }
-    

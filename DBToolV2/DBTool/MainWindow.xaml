@@ -5,47 +5,52 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DBTool"
         xmlns:Controls="clr-namespace:DBTool.Controls" x:Class="DBTool.MainWindow"
+        xmlns:converters="clr-namespace:DBTool.Commons"
         mc:Ignorable="d"
         Title="DBTool" Height="450" Width="800" Icon="/support.ico" WindowState="Maximized" Background="White">
+    <Window.Resources>
+        <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+    </Window.Resources>
     <Grid ShowGridLines="False">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <DockPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
-            <Grid ShowGridLines="False">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-                <RadioButton Grid.Row="0" Grid.Column="0" Content="📊" Name="rdoDashboard" Checked="mainRdo_Checked"  PreviewMouseDown="checkSettingsObject_PreviewMouseDown"  ToolTip="Dashboard"/>
-                <RadioButton  Grid.Row="1" Grid.Column="0" Content="🗄" Name="rdoDatabase" Checked="mainRdo_Checked"  PreviewMouseDown="checkSettingsObject_PreviewMouseDown"  ToolTip="Database" Visibility="Collapsed"/>
-                <RadioButton Grid.Row="2" Grid.Column="0" Content="🌍" Name="rdoEnvironment" Checked="mainRdo_Checked"  PreviewMouseDown="checkSettingsObject_PreviewMouseDown"  ToolTip="Environment"/>
-                <RadioButton Grid.Row="4" Grid.Column="0" Content="⚙" VerticalAlignment="Bottom" Margin="0,0,0,20" Name="rdoSettings" Checked="mainRdo_Checked" ToolTip="Settings"/>
-
-            </Grid>
-        </DockPanel>
-        <Border Grid.Column="1" Grid.RowSpan="2" Background="LightGray" Margin="0,10,0,10"/>
-        <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="auto" Grid.Column="2" Margin="10" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="4" >-->
-        <DockPanel Name="mainDockPanel" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+                <Grid ShowGridLines="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Grid.Row="0" Grid.Column="0" Content="📊" Name="rdoDashboard" Checked="mainRdo_Checked"  PreviewMouseDown="checkSettingsObject_PreviewMouseDown"  ToolTip="Dashboard"/>
+                    <RadioButton  Grid.Row="1" Grid.Column="0" Content="🗄" Name="rdoDatabase" Checked="mainRdo_Checked"  PreviewMouseDown="checkSettingsObject_PreviewMouseDown"  ToolTip="Database" Visibility="Collapsed"/>
+                    <RadioButton Grid.Row="2" Grid.Column="0" Content="🌍" Name="rdoEnvironment" Checked="mainRdo_Checked"  PreviewMouseDown="checkSettingsObject_PreviewMouseDown"  ToolTip="Environment"/>
+                    <RadioButton Grid.Row="4" Grid.Column="0" Content="⚙" VerticalAlignment="Bottom" Margin="0,0,0,20" Name="rdoSettings" Checked="mainRdo_Checked" ToolTip="Settings"/>
+                    <TextBlock Grid.Row="5" Grid.Column="0" Background="{Binding CheckAccess, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToBrushConverter}}"/>
+                </Grid>
+            </DockPanel>
+            <Border Grid.Column="1" Grid.RowSpan="2" Background="LightGray" Margin="0,0,0,0"/>
+            <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="auto" Grid.Column="2" Margin="10" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="4" >-->
+            <DockPanel Name="mainDockPanel" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="4">
                 <Grid>
                     <Controls:DashboardControl x:Name="dashboardControl"/>
                     <Controls:SettingsControl x:Name="settingsControl"/>
                     <Controls:EnvironmentControl x:Name="environmentControl"/>
                 </Grid>
             </DockPanel>
-        <!--</ScrollViewer>-->
-    </Grid>
+            <!--</ScrollViewer>-->
+        </Grid>
 </Window>

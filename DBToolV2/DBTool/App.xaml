@@ -150,6 +150,7 @@
             <Setter Property="BorderBrush" Value="LightGray"/>
             <Setter Property="BorderThickness" Value="0,0,1,1"/>
             <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Padding" Value="5,2,5,2"/>
             <!-- header + vertical lines -->
         </Style>
 
@@ -387,7 +388,11 @@
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
         <ContextMenu x:Key="SharedListViewContextMenu">
-            <MenuItem Header="Copy Value" Click="MenuItem_Click"/>
+            <MenuItem x:Name="cmCopyValue" Header="Copy Value" Click="MenuItem_Click"/>
+            <MenuItem Header="Export">
+                <MenuItem x:Name="cmExportJSON" Header="Export to JSON" Click="Export_Click" Tag="JSON"/>
+                <MenuItem x:Name="cmExportExcel" Header="Export to Excel" Click="Export_Click" Tag="EXCEL"/>
+            </MenuItem>
         </ContextMenu>
         <Style TargetType="ListView">
             <Setter Property="ContextMenu" Value="{StaticResource SharedListViewContextMenu}"/>

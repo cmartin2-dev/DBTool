@@ -28,6 +28,11 @@ namespace DBTool
 
             rdoDashboard.IsChecked = true;
 
+
+            this.DataContext = StaticFunctions.AppConnection.settingsObject;
+
+            StaticFunctions.AppConnection.settingsObject.CheckAccess = StaticFunctions.AppConnection.settingsObject.IsFullAccess;
+
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -47,32 +52,15 @@ namespace DBTool
             settingsControl.Visibility = rdoSettings.IsChecked == true ? Visibility.Visible: Visibility.Collapsed;
             environmentControl.Visibility = rdoEnvironment.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
 
-            //if (rdoDashboard.IsChecked == true)
-            //{
-            //    if (dashboardControl != null)
-            //        dashboardControl = null;
-
-            //    dashboardControl = new DashboardControl();
-            //    mainDockPanel.Children.Add(dashboardControl);
-            //}
+            settingsControl.SetDataContext();
+            environmentControl.SetDataContext();
+            
             if (rdoSettings.IsChecked == true)
             {
+
+
                 settingsControl.rdoDatabaseSettings.IsChecked = true;
-                //if (settingsControl != null)
-                //    settingsControl = null;
-
-                //settingsControl = new SettingsControl();
-                //mainDockPanel.Children.Add(settingsControl);
             }
-
-            //if (rdoEnvironment.IsChecked == true)
-            //{
-            //    if (environmentControl != null)
-            //        environmentControl = null;
-
-            //    environmentControl = new EnvironmentControl();
-            //    mainDockPanel.Children.Add(environmentControl);
-            //}
 
         }
 
@@ -90,7 +78,8 @@ namespace DBTool
                 if (MessageBox.Show("Settings has not been saved. Do you want to discard any changes?", "Unsaved Settings", MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
                 {
                     StaticFunctions.AppConnection.RevertSettings();
-                    
+                    this.DataContext = StaticFunctions.AppConnection.settingsObject;
+
                     e.Handled = false;
                     (sender as RadioButton).IsChecked = true;
                 }
@@ -102,42 +91,5 @@ namespace DBTool
         }
     }
 
-    public class ProgressToWidthConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (values == null || values.Length < 3) return 0.0;
-
-            if (!double.TryParse(values[0]?.ToString(), out double value)) return 0.0;
-            if (!double.TryParse(values[1]?.ToString(), out double maximum)) return 0.0;
-            if (!double.TryParse(values[2]?.ToString(), out double actualWidth)) return 0.0;
-
-            if (maximum <= 0) return 0.0;
-            double ratio = Math.Max(0.0, Math.Min(1.0, value / maximum));
-            // You may want to subtract padding/margins if your template has them
-            return ratio * actualWidth;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class SecondsToTimeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is double seconds)
-            {
-                return TimeSpan.FromSeconds(seconds).ToString(@"mm\:ss");
-            }
-            return "00:00";
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+   
 }
