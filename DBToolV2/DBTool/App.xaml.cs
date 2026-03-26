@@ -20,6 +20,8 @@ namespace DBTool
 
         private bool isCell;
         private string selectedCellValue;
+
+        private CancellationTokenSource _cts;
         public ObservableCollection<TabItem> MyTabs { get; }
             = new ObservableCollection<TabItem> ();
 
@@ -100,6 +102,10 @@ namespace DBTool
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
+
             var textBox = sender as TextBox;
             if (textBox == null) return;
 
@@ -111,53 +117,77 @@ namespace DBTool
 
             string filterText = textBox.Text?.Trim() ?? string.Empty;
 
-            view.Filter = item =>
+            // Debounce filtering to avoid refreshing on every keystroke
+            _ = Task.Run(async () =>
             {
-                if (string.IsNullOrEmpty(filterText))
-                    return true;
-
-                // Look at all GridViewColumns
-                if (listView.View is GridView gridView)
+                try
                 {
-                    foreach (var col in gridView.Columns)
+                    await Task.Delay(300, token); // 300ms delay
+                    if (token.IsCancellationRequested) return;
+
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        // Works only if using DisplayMemberBinding
-                        if (col.DisplayMemberBinding is Binding binding)
+                        // Cache column property paths to avoid repeated reflection
+                        var propertyPaths = new List<string>();
+                        if (listView.View is GridView gridView)
                         {
+                            foreach (var col in gridView.Columns)
+                            {
+                                if (col.DisplayMemberBinding is Binding binding)
+                                    propertyPaths.Add(binding.Path.Path);
+                            }
+                        }
+
+                        view.Filter = item =>
+                        {
+                            if (string.IsNullOrEmpty(filterText)) return true;
+
                             if (item is IDictionary<string, object> dict)
                             {
-                                foreach (var value in dict.Values)
-                                {
-                                    var text = value?.ToString() ?? string.Empty;
-                                    if (text.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0)
-                                        return true;
-                                }
+                                return dict.Values.Any(v =>
+                                    v?.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0);
                             }
                             else
                             {
-
-                                var prop = item.GetType().GetProperty(binding.Path.Path);
-                                if (prop != null)
+                                foreach (var path in propertyPaths)
                                 {
-                                    var value = prop.GetValue(item)?.ToString() ?? string.Empty;
-                                    if (value.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0)
-                                        return true;
+                                    var prop = item.GetType().GetProperty(path);
+                                    if (prop != null)
+                                    {
+                                        var value = prop.GetValue(item)?.ToString() ?? string.Empty;
+                                        if (value.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0)
+                                            return true;
+                                    }
                                 }
                             }
-                        }
-                    }
+
+                            return false;
+                        };
+
+                        view.Refresh();
+                    });
                 }
-
-                return false;
-            };
-
-            view.Refresh();
+                catch (TaskCanceledException) { }
+            });
         }
 
 
         private void Export_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void ComboBox_ClearClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                var combo = FindParent<ComboBox>(btn);
+                if (combo != null)
+                {
+                    combo.SelectedIndex = -1;
+                    combo.SelectedItem = null;
+                }
+            }
         }
 
         private void cmExportExcel_Click(object sender, RoutedEventArgs e)

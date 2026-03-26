@@ -1,0 +1,82 @@
+﻿<UserControl x:Class="DBTool.Controls.LanguageSettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DBTool.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid ShowGridLines="False" Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Language / Locale" Style="{StaticResource headerLabel}" Margin="0,0,0,12"/>
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="450"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Language list -->
+            <Border Grid.Column="0" Background="{DynamicResource CardBrush}" CornerRadius="10" Padding="0"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,12,0">
+                <ListView x:Name="lstviewLanguage" ItemsSource="{Binding Languages}" SelectionMode="Single"
+                          SelectionChanged="lstviewLanguage_SelectionChanged"/>
+            </Border>
+
+            <!-- Detail panel -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Action buttons -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                    <Label Content="➕" Name="btnAdd" ToolTip="Add" Style="{StaticResource labelButton}" MouseDown="btnAdd_MouseDown" Margin="4"/>
+                    <Label Content="📋" Name="btnCopy" ToolTip="Copy" Style="{StaticResource labelButton}" MouseDown="btnCopy_MouseDown" Margin="4"/>
+                    <Label Content="🗑️" Name="btnDelete" ToolTip="Delete" Style="{StaticResource labelButton}" MouseDown="btnDelete_MouseDown" Margin="4"/>
+                    <Label Content="⛔" Name="btnCancel" ToolTip="Cancel" Style="{StaticResource labelButton}" MouseDown="btnCancel_MouseDown" Margin="4"/>
+                </StackPanel>
+
+                <!-- Details form -->
+                <Border Grid.Row="1" Background="{DynamicResource CardBrush}" CornerRadius="10" Padding="16"
+                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                    <StackPanel x:Name="stackPanelDetails">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="200"/>
+                            </Grid.RowDefinitions>
+
+                            <Label Content="Name" Grid.Row="0" Grid.Column="0" Style="{StaticResource commonLabel}" Margin="4"/>
+                            <TextBox x:Name="txtName" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                     Style="{StaticResource TextboxValidation}" Grid.Row="0" Grid.Column="1" Margin="4"/>
+
+                            <Label Content="Culture" Grid.Row="1" Grid.Column="0" Style="{StaticResource commonLabel}" Margin="4"/>
+                            <TextBox x:Name="txtCulture" Text="{Binding Culture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                     Style="{StaticResource TextboxValidation}" Grid.Row="1" Grid.Column="1" Margin="4"/>
+
+                            <Label Content="Excluded Keys" Grid.Row="2" Grid.Column="0" Style="{StaticResource commonLabel}" Margin="4"/>
+                            <TextBox x:Name="txtExcludedKeys" Grid.Row="2" Grid.Column="1" Margin="4"
+                                     VerticalContentAlignment="Top" VerticalScrollBarVisibility="Auto"
+                                     AcceptsReturn="True" TextWrapping="Wrap"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

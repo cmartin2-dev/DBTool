@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="DBTool.Controls.LoadingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DBTool.Controls"
+             xmlns:converters="clr-namespace:DBTool.Commons"
+             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <!-- Loading -->
+        <Grid Background="#50000000" x:Name="loadingborder" Visibility="Collapsed">
+            <Border Background="{DynamicResource CardBrush}" CornerRadius="16" Padding="40,28" MinWidth="220"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.12" Color="Black"/>
+                </Border.Effect>
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Loading..." FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               FontFamily="{StaticResource AppFont}" HorizontalAlignment="Center"/>
+                    <ProgressBar IsIndeterminate="True" Margin="0,14,0,0" Width="160"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+        <!-- Error -->
+        <Grid Background="#50000000" x:Name="Errorborder" Visibility="Collapsed">
+            <Border Background="{DynamicResource CardBrush}" CornerRadius="16" Padding="40,28" MinWidth="260"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    BorderBrush="{DynamicResource DangerBrush}" BorderThickness="0,3,0,0">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.12" Color="Black"/>
+                </Border.Effect>
+                <StackPanel HorizontalAlignment="Center">
+                    <Label Content="Error" x:Name="txtErrorName" Foreground="{DynamicResource DangerBrush}"
+                           FontSize="15" FontWeight="SemiBold" FontFamily="{StaticResource AppFont}"
+                           HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="txtErrorDetail" Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontSize="13" FontFamily="{StaticResource AppFont}"
+                               HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="360"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+        <!-- Done -->
+        <Grid Background="#50000000" x:Name="Doneborder" Visibility="Collapsed">
+            <Border Background="{DynamicResource CardBrush}" CornerRadius="16" Padding="40,28" MinWidth="220"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    BorderBrush="{DynamicResource SuccessBrush}" BorderThickness="0,3,0,0">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.12" Color="Black"/>
+                </Border.Effect>
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Done" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource SuccessBrush}"
+                               FontFamily="{StaticResource AppFont}" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="txtRowsAffected" Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontSize="13" FontFamily="{StaticResource AppFont}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

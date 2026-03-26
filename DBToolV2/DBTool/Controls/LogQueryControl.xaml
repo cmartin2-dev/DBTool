@@ -1,0 +1,159 @@
+﻿<Window x:Class="DBTool.Controls.LogQueryControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DBTool.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="400" Title="Query Log"
+             WindowStartupLocation="CenterScreen" SizeToContent="Height"
+             Background="{DynamicResource SurfaceBrush}">
+    <Border Margin="16" Padding="0" Background="{DynamicResource CardBrush}" CornerRadius="12"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.10" Color="Black"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="{DynamicResource DataGridHeaderBgBrush}"
+                    CornerRadius="12,12,0,0" Padding="24,18">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x1F4DD;" FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBlock Text="Query Log" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Log your executed query with details for tracking"
+                               FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
+                               FontFamily="{StaticResource AppFont}" Margin="30,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Form Body -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24,20">
+                <StackPanel>
+
+                    <!-- Ticket &amp; Version Row -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- JIRA Ticket -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="JIRA Ticket" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontFamily="{StaticResource AppFont}" Margin="2,0,0,6"/>
+                            <TextBox x:Name="txtJiraTicket"
+                                     Text="{Binding JIRATicket, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <!-- Release Version -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Release Version" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontFamily="{StaticResource AppFont}" Margin="2,0,0,6"/>
+                            <TextBox x:Name="txtReleaseVersion"
+                                     Text="{Binding ReleaseVersion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Description -->
+                    <StackPanel Margin="0,0,0,16">
+                        <TextBlock Text="Description of Script" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontFamily="{StaticResource AppFont}" Margin="2,0,0,6"/>
+                        <TextBox x:Name="txtDescriptionOfScript" Height="120"
+                                 AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Auto" VerticalContentAlignment="Top"
+                                 TextWrapping="Wrap"
+                                 Text="{Binding DescriptionOfScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <!-- Separator -->
+                    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Margin="0,4,0,16"/>
+
+                    <!-- Metadata Row -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Date Executed -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Date Executed" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontFamily="{StaticResource AppFont}" Margin="2,0,0,6"/>
+                            <TextBox x:Name="txtDateExecuted"
+                                     Text="{Binding DateExecuted, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <!-- Tenant Id -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Tenant Id" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontFamily="{StaticResource AppFont}" Margin="2,0,0,6"/>
+                            <TextBox x:Name="txtTenantId"
+                                     Text="{Binding TenantId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <!-- Schema Version -->
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Schema Version" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontFamily="{StaticResource AppFont}" Margin="2,0,0,6"/>
+                            <TextBox x:Name="txtSchemaVersion"
+                                     Text="{Binding SchemaVersion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Script -->
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="Script" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontFamily="{StaticResource AppFont}" Margin="2,0,0,6"/>
+                        <Border Background="{DynamicResource DataGridHeaderBgBrush}" CornerRadius="6"
+                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Padding="2">
+                            <TextBox x:Name="txtScript" Height="150" VerticalContentAlignment="Top"
+                                     AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto" IsReadOnly="True"
+                                     Text="{Binding Script, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     TextWrapping="Wrap" Background="Transparent" BorderThickness="0"
+                                     FontFamily="Cascadia Code, Consolas, Courier New" FontSize="12"
+                                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        </Border>
+                    </StackPanel>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Footer -->
+            <Border Grid.Row="2" Background="{DynamicResource DataGridHeaderBgBrush}"
+                    CornerRadius="0,0,12,12" Padding="24,14"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+                <DockPanel>
+                    <TextBlock Text="All fields are optional except Script"
+                               FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                               FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"
+                               DockPanel.Dock="Left"/>
+                    <Button x:Name="btnSave" Content="&#x1F4BE;  Save Log" 
+                            Click="btnSave_Click" Style="{StaticResource RoundButton}"
+                            HorizontalAlignment="Right" Padding="24,10" MinWidth="120"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

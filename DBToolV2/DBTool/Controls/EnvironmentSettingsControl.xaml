@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="DBTool.Controls.EnvironmentSettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DBTool.Controls"
+             xmlns:commons="clr-namespace:DBTool.Commons"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid ShowGridLines="False">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Environment" Style="{StaticResource headerLabel}"/>
+
+        <!-- Sub-nav -->
+        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource CardBrush}" CornerRadius="10" Padding="6,10"
+                Margin="0,0,12,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <StackPanel Width="64">
+                <RadioButton Name="rdoRegion" Content="📍" ToolTip="Regions" Checked="rdoMain_Checked"/>
+                <RadioButton Name="rdoTenant" Content="👥" ToolTip="Tenants" Checked="rdoMain_Checked"/>
+                <RadioButton Name="rdoServer" Content="🗄️" ToolTip="Environment Server" Checked="rdoMain_Checked"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Content -->
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" Style="{StaticResource grayBorders}" Margin="0">
+            <DockPanel>
+                <local:RegionSettingsControl x:Name="regionSettingsControl"/>
+                <local:TenantsSettingsControl x:Name="tenantsSettingsControl"/>
+                <local:EnvironmentServerSettingsControl x:Name="environmentServerSettingsControl"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>
