@@ -78,6 +78,10 @@ namespace DBTool.Controls
             {
                 txtQuery.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
             }
+
+            // Add SQL column highlighter
+            var columnColorizer = new DBTool.Commons.SqlColumnColorizer();
+            txtQuery.TextArea.TextView.LineTransformers.Add(columnColorizer);
         }
 
         private void AddTextboxQueryContextMenu()

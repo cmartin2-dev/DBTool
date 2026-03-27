@@ -43,6 +43,9 @@
     <None Update="settings.set">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+    <None Update="schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 

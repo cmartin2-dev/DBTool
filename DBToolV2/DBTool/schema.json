@@ -1,0 +1,14 @@
+[
+  {
+    "table": "STYLEMEASPOM",
+    "columns": ["STYLEMEASPOMID", "STYLEMEASID", "POMNAME", "POMDESC"]
+  },
+  {
+    "table": "STYLEMEASPOMSIZE",
+    "columns": ["STYLEMEASPOMSIZEID", "STYLEMEASPOMID", "STYLEMEASSIZEID"]
+  },
+  {
+    "table": "DATASCHEMAS",
+    "columns": ["DATASCHEMASID", "MODULECODE", "NAME", "SCHEMANAME", "DBVERSION", "ISREADY", "STATUSMSG"]
+  }
+]
