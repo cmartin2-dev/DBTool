@@ -94,7 +94,7 @@ namespace DBTool.Connect
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Failed to save execution log: {ex.Message}", "Log Error");
+                DBTool.Controls.ThemedDialog.Show($"Failed to save execution log: {ex.Message}", "Log Error");
             }
         }
 

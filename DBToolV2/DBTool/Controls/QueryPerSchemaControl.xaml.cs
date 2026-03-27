@@ -175,7 +175,7 @@ namespace DBTool.Controls
                         {
                             if (child.SelectedSchemas.Count == 0 && chkSCAH.IsChecked == false)
                             {
-                                MessageBox.Show("Please select at least 1 schema per environment", "Error", MessageBoxButton.OK);
+                                ThemedDialog.Show("Please select at least 1 schema per environment", "Error");
                                 return;
                             }
                             else

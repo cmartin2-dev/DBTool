@@ -107,7 +107,7 @@ namespace DBTool.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                ThemedDialog.Show(ex.Message);
             }
         }
 
@@ -125,7 +125,7 @@ namespace DBTool.Controls
                     Clipboard.SetText(jsonString);
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { ThemedDialog.Show(ex.Message); }
         }
 
         private void GenerateInsertScript()
@@ -165,7 +165,7 @@ namespace DBTool.Controls
 
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { ThemedDialog.Show(ex.Message); }
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)

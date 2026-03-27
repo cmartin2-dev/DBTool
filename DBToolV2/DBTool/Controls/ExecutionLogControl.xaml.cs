@@ -32,7 +32,7 @@ namespace DBTool.Controls
 
         private void btnClearLog_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Clear all execution logs?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            if (ThemedDialog.Confirm("Clear all execution logs?", "Confirm"))
             {
                 var log = new ExecutionLog();
                 // Save empty list

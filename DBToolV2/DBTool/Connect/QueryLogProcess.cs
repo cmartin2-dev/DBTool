@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace DBTool.Connect
 {
@@ -79,7 +78,7 @@ namespace DBTool.Connect
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message,"Error",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                DBTool.Controls.ThemedDialog.Show(ex.Message, "Error");
             }
         }
     }

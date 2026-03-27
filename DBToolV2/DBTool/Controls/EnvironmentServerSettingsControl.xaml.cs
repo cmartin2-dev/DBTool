@@ -137,7 +137,7 @@ namespace DBTool.Controls
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (MessageBox.Show("Do you want to delete this server?", "Delete Server", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                if (ThemedDialog.Confirm("Do you want to delete this server?", "Delete Server"))
                 {
                     {
                         EnableAddEnvironmentServer(true);

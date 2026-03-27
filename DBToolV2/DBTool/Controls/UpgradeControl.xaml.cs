@@ -105,7 +105,7 @@ namespace DBTool.Controls
             var regionTenant = this.DataContext as RegionTenant;
             if (regionTenant == null || regionTenant.Region == null)
             {
-                MessageBox.Show("Please select an environment first.", "No Environment", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please select an environment first.", "No Environment");
                 return;
             }
 
@@ -273,14 +273,14 @@ namespace DBTool.Controls
             var items = dgChangesets.ItemsSource as List<ChangesetDisplayItem>;
             if (items == null || !items.Any())
             {
-                MessageBox.Show("Please load changesets first.", "No Changesets", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please load changesets first.", "No Changesets");
                 return;
             }
 
             var dataContext = this.DataContext as RegionTenant;
             if (dataContext == null || dataContext.Region == null)
             {
-                MessageBox.Show("No environment selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ThemedDialog.Show("No environment selected.", "Error");
                 return;
             }
 
@@ -376,13 +376,13 @@ namespace DBTool.Controls
             var selected = GetSelectedVersions();
             if (!selected.Any())
             {
-                MessageBox.Show("Please select at least one version.", "No Version Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please select at least one version.", "No Version Selected");
                 return;
             }
 
             if (string.IsNullOrEmpty(_upgradeFolderPath))
             {
-                MessageBox.Show("Please select an upgrade folder.", "No Folder Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please select an upgrade folder.", "No Folder Selected");
                 return;
             }
 
@@ -392,7 +392,7 @@ namespace DBTool.Controls
                 var modules = GetSelectedModules();
                 if (!modules.Any())
                 {
-                    MessageBox.Show("Please check at least one module (SCAH or FSH).", "No Module", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ThemedDialog.Show("Please check at least one module (SCAH or FSH).", "No Module");
                     return;
                 }
                 _loadedChangesets = StaticFunctions.ReadUpgradeFolder(_upgradeFolderPath, selected, parameters, modules);
@@ -446,13 +446,13 @@ namespace DBTool.Controls
             var selected = GetSelectedVersions();
             if (!selected.Any())
             {
-                MessageBox.Show("Please select at least one version.", "No Version Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please select at least one version.", "No Version Selected");
                 return;
             }
 
             if (string.IsNullOrEmpty(_upgradeFolderPath))
             {
-                MessageBox.Show("Please select an upgrade folder.", "No Folder Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please select an upgrade folder.", "No Folder Selected");
                 return;
             }
 
@@ -482,20 +482,20 @@ namespace DBTool.Controls
             var selected = GetSelectedVersions();
             if (!selected.Any())
             {
-                MessageBox.Show("Please select at least one version.", "No Version Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please select at least one version.", "No Version Selected");
                 return;
             }
 
             if (string.IsNullOrEmpty(_upgradeFolderPath))
             {
-                MessageBox.Show("Please select an upgrade folder.", "No Folder Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please select an upgrade folder.", "No Folder Selected");
                 return;
             }
 
             var dataContext = this.DataContext as RegionTenant;
             if (dataContext == null || dataContext.Region == null)
             {
-                MessageBox.Show("No environment selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ThemedDialog.Show("No environment selected.", "Error");
                 return;
             }
 
@@ -509,8 +509,7 @@ namespace DBTool.Controls
                 return;
             }
 
-            if (MessageBox.Show($"Execute upgrade for {selected.Count} version(s)?", "Confirm Execution",
-                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            if (!ThemedDialog.Confirm($"Execute upgrade for {selected.Count} version(s)?", "Confirm Execution"))
                 return;
 
             _isRunning = true;
@@ -532,7 +531,7 @@ namespace DBTool.Controls
 
                 if (!selectedItems.Any())
                 {
-                    MessageBox.Show("No changesets selected to run.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ThemedDialog.Show("No changesets selected to run.", "No Selection");
                     _isRunning = false;
                     btnExecute.Content = "Execute Upgrade";
                     return;
@@ -541,7 +540,7 @@ namespace DBTool.Controls
                 var checkedSchemas = GetCheckedSchemas();
                 if (!checkedSchemas.Any())
                 {
-                    MessageBox.Show("No schemas checked. Please check at least one schema.", "No Schema", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ThemedDialog.Show("No schemas checked. Please check at least one schema.", "No Schema");
                     _isRunning = false;
                     btnExecute.Content = "Execute Upgrade";
                     return;

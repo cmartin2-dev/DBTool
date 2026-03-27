@@ -221,13 +221,13 @@ namespace DBTool.Controls
             string url = txtUrl.Text?.Trim();
             if (string.IsNullOrEmpty(url))
             {
-                MessageBox.Show("Please enter a URL.", "No URL", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please enter a URL.", "No URL");
                 return;
             }
 
             if (_selectedHeader == null)
             {
-                MessageBox.Show("Please select a region first.", "No Region", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ThemedDialog.Show("Please select a region first.", "No Region");
                 return;
             }
 

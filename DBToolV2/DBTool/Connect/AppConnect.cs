@@ -25,7 +25,7 @@ namespace DBTool.Connect
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DBTool.Controls.ThemedDialog.Show(ex.Message, "Error");
             }
         }
 
@@ -68,11 +68,11 @@ namespace DBTool.Connect
 
 
 
-                MessageBox.Show("Settings saved successfully", "Save Settings", MessageBoxButton.OK);
+                DBTool.Controls.ThemedDialog.Show("Settings saved successfully", "Save Settings");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DBTool.Controls.ThemedDialog.Show(ex.Message, "Error");
             }
         }
 

@@ -194,7 +194,7 @@ namespace DBTool.Commons
 
             if (dt == null)
             {
-                MessageBox.Show("Unable to export data.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DBTool.Controls.ThemedDialog.Show("Unable to export data.", "Error");
             }
         }
 
@@ -702,7 +702,7 @@ namespace DBTool.Commons
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                DBTool.Controls.ThemedDialog.Show(ex.Message);
             }
         }
 
@@ -765,7 +765,7 @@ namespace DBTool.Commons
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                DBTool.Controls.ThemedDialog.Show(ex.Message);
             }
         }
 
@@ -1065,7 +1065,7 @@ namespace DBTool.Commons
                     Clipboard.SetText(jsonString);
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { DBTool.Controls.ThemedDialog.Show(ex.Message); }
         }
 
         public static CustObj ProcessSCAHLocale(List<CustomObject> localeObj, List<CustomObject> ExcelObj, List<Language> selectedLanguages)

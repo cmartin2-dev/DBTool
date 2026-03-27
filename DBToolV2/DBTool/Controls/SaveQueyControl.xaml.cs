@@ -37,7 +37,7 @@ namespace DBTool.Controls
 
             if (string.IsNullOrEmpty(ItemName))
             {
-                MessageBox.Show("Name is required.");
+                ThemedDialog.Show("Name is required.");
                 return;
             }
 

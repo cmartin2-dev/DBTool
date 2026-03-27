@@ -188,7 +188,7 @@ namespace DBTool.Controls
                 if (saveQueryDialog.ShowDialog() == true)
                 {
 
-                    MessageBox.Show("Item saved into list.");
+                    ThemedDialog.Show("Item saved into list.");
                 }
             }
         }

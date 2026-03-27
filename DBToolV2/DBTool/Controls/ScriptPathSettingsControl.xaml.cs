@@ -45,7 +45,7 @@ namespace DBTool.Controls
                 }
                 else
                 {
-                    MessageBox.Show("Invalid forlder path","Error",MessageBoxButton.OK, MessageBoxImage.Error);
+                    ThemedDialog.Show("Invalid forlder path","Error");
                 }
             }
         }

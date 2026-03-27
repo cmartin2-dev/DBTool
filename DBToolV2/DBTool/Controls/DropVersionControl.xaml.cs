@@ -76,7 +76,7 @@ namespace DBTool.Controls
         {
             if (isDeleteRunning)
             {
-                MessageBox.Show("Deleting in progress");
+                ThemedDialog.Show("Deleting in progress");
                 return;
             }
 
@@ -288,7 +288,7 @@ namespace DBTool.Controls
         {
             if (isRunning)
             {
-                MessageBox.Show("Query in progress");
+                ThemedDialog.Show("Query in progress");
                 return;
             }
 
@@ -300,7 +300,7 @@ namespace DBTool.Controls
             {
                 if (isRunning)
                 {
-                    MessageBox.Show("Query in progress");
+                    ThemedDialog.Show("Query in progress");
                     return;
                 }
 

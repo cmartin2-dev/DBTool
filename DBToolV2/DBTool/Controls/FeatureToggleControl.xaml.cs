@@ -100,7 +100,7 @@ namespace DBTool.Controls
                     Clipboard.SetText(jsonString);
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { ThemedDialog.Show(ex.Message); }
         }
 
         private void _timer_Tick(object? sender, EventArgs e)
@@ -220,7 +220,7 @@ namespace DBTool.Controls
                 RequestResponse _response = task.Result;
                 if (_response.isSuccess)
                 {
-                    MessageBox.Show("App feature saved successfully.", "Saved", MessageBoxButton.OK);
+                    ThemedDialog.Show("App feature saved successfully.", "Saved");
                 }
             }
         }
@@ -330,7 +330,7 @@ namespace DBTool.Controls
 
                 if(string.IsNullOrWhiteSpace(key))
                 {
-                    MessageBox.Show("Key is required","ERROR",MessageBoxButton.OK, MessageBoxImage.Error);
+                    ThemedDialog.Show("Key is required","ERROR");
                     return;
                 }
 

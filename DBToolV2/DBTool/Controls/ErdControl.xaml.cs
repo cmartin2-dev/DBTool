@@ -53,7 +53,7 @@ namespace DBTool.Controls
                 string dllDirectory = @"FPLMDLL";
                 if (!Directory.Exists(dllDirectory))
                 {
-                    MessageBox.Show("Missing DLL directory.", "ERROR", MessageBoxButton.OK);
+                    ThemedDialog.Show("Missing DLL directory.", "ERROR");
                     return;
                 }
 

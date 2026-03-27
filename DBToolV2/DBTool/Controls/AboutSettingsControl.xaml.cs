@@ -62,15 +62,15 @@ namespace DBTool.Controls
 
             if (extractedPath != null)
             {
-                if (MessageBox.Show("Update downloaded. Restart now to apply?",
-                    "Update Ready", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                if (ThemedDialog.Confirm("Update downloaded. Restart now to apply?",
+                    "Update Ready"))
                 {
                     AppUpdater.ApplyUpdate(extractedPath);
                 }
             }
             else
             {
-                MessageBox.Show("Download failed.", "Error");
+                ThemedDialog.Show("Download failed.", "Error");
             }
 
             btnDownloadUpdate.IsEnabled = true;
@@ -78,15 +78,65 @@ namespace DBTool.Controls
             progressUpdate.Visibility = Visibility.Collapsed;
         }
 
-        private void btnViewChangelog_Click(object sender, RoutedEventArgs e)
+        private async void btnViewChangelog_Click(object sender, RoutedEventArgs e)
         {
-            if (_latestVersion?.changelog != null)
+            try
             {
-                Process.Start(new ProcessStartInfo
+                var client = new System.Net.Http.HttpClient();
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("DBTool-Updater");
+
+                string markdown = null;
+
+                // Try changelogdDir from version.json first
+                if (!string.IsNullOrEmpty(_latestVersion?.changelogdDir))
                 {
-                    FileName = _latestVersion.changelog,
-                    UseShellExecute = true
-                });
+                    try { markdown = await client.GetStringAsync(_latestVersion.changelogdDir); }
+                    catch { }
+                }
+
+                // Fallback to raw repo CHANGELOG.md
+                if (string.IsNullOrEmpty(markdown))
+                {
+                    try { markdown = await client.GetStringAsync("https://raw.githubusercontent.com/cmartin2-dev/DBTool/main/CHANGELOG.md"); }
+                    catch { }
+                }
+
+                if (string.IsNullOrEmpty(markdown))
+                {
+                    ThemedDialog.Show("Could not load changelog.", "Error");
+                    return;
+                }
+
+                var window = new Window
+                {
+                    Title = "Release Notes",
+                    Width = 600,
+                    Height = 500,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = System.Windows.Application.Current.MainWindow,
+                    Background = (System.Windows.Media.Brush)FindResource("SurfaceBrush")
+                };
+
+                var textBox = new System.Windows.Controls.TextBox
+                {
+                    Text = markdown,
+                    IsReadOnly = true,
+                    TextWrapping = TextWrapping.Wrap,
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                    FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+                    FontSize = 12,
+                    Margin = new Thickness(16),
+                    BorderThickness = new Thickness(0),
+                    Background = (System.Windows.Media.Brush)FindResource("SurfaceBrush"),
+                    Foreground = (System.Windows.Media.Brush)FindResource("TextPrimaryBrush")
+                };
+
+                window.Content = textBox;
+                window.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                ThemedDialog.Show($"Could not load changelog: {ex.Message}", "Error");
             }
         }
     }

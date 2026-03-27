@@ -201,7 +201,7 @@ namespace DBTool.Controls
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (MessageBox.Show("Do you want to delete this region?", "Delete Region", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                if (ThemedDialog.Confirm("Do you want to delete this region?", "Delete Region"))
                 {
                     {
                         EnableAddRegion(true);

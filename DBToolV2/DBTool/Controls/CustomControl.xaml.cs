@@ -94,25 +94,25 @@ namespace DBTool.Controls
 
             if (regionTenant == null)
             {
-                MessageBox.Show("Select Tenant", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ThemedDialog.Show("Select Tenant", "Error");
                 return;
             }
 
             if (regionTenant.Region == null)
             {
-                MessageBox.Show("Select Tenant", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ThemedDialog.Show("Select Tenant", "Error");
                 return;
             }
 
             if(cmbServer.SelectedItem == null)
             {
-                MessageBox.Show("Select Server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ThemedDialog.Show("Select Server", "Error");
                 return;
             }
 
             if (cmbDatabase.SelectedItem == null)
             {
-                MessageBox.Show("Select Database", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ThemedDialog.Show("Select Database", "Error");
                 return;
             }
 

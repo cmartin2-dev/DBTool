@@ -143,7 +143,7 @@ namespace DBTool
             if (!StaticFunctions.AppConnection.CheckDirty())
             {
 
-                if (MessageBox.Show("Settings has not been saved. Do you want to discard any changes?", "Unsaved Settings", MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
+                if (Controls.ThemedDialog.Confirm("Settings has not been saved. Do you want to discard any changes?", "Unsaved Settings"))
                 {
                     StaticFunctions.AppConnection.RevertSettings();
                     this.DataContext = StaticFunctions.AppConnection.settingsObject;
