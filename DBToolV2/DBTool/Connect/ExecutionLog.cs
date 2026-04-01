@@ -16,6 +16,7 @@ namespace DBTool.Connect
         public string Query { get; set; }
         public string Version { get; set; }
         public string Status { get; set; }
+        public string ErrorMessage { get; set; }
         public string DateExecuted { get; set; }
         public string ExecutedBy { get; set; }
     }
@@ -50,6 +51,7 @@ namespace DBTool.Connect
                     Query = query ?? "",
                     Version = "",
                     Status = status,
+                    ErrorMessage = errorMessage ?? "",
                     DateExecuted = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     ExecutedBy = Environment.UserName
                 });

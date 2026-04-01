@@ -11,9 +11,14 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Button x:Name="rdoExecute" Content="&#x25B6;  Execute" ToolTip="Execute"
-                Grid.Row="0" Margin="4" HorizontalAlignment="Left"
-                Click="Button_Click" Style="{StaticResource RoundButton}"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button x:Name="rdoExecute" Content="&#x25B6;  Execute" ToolTip="Execute"
+                    Margin="4" HorizontalAlignment="Left"
+                    Click="Button_Click" Style="{StaticResource RoundButton}"/>
+            <Button x:Name="btnFormat" Content="Format SQL" ToolTip="Format SQL (Ctrl+Shift+F)"
+                    Margin="4" HorizontalAlignment="Left"
+                    Click="btnFormat_Click" Style="{StaticResource RoundButton}"/>
+        </StackPanel>
         <Border Grid.Row="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                 CornerRadius="8" SnapsToDevicePixels="True" Background="{DynamicResource CardBrush}">
             <avalon:TextEditor x:Name="txtQuery" PreviewMouseWheel="MyRichTextBox_PreviewMouseWheel"

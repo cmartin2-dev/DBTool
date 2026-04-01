@@ -48,7 +48,12 @@ namespace DBTool.Controls
             var selected = dgLog.SelectedItem as ExecutionLogEntry;
             if (selected != null)
             {
-                txtQueryPreview.Text = selected.Query ?? selected.Comment ?? "(no query)";
+                string preview = selected.Query ?? selected.Comment ?? "(no query)";
+                if (!string.IsNullOrEmpty(selected.ErrorMessage))
+                {
+                    preview += "\n\n--- Error ---\n" + selected.ErrorMessage;
+                }
+                txtQueryPreview.Text = preview;
             }
         }
 

@@ -77,7 +77,7 @@ namespace DBTool.Commons
     public static class SqlTableParser
     {
         private static readonly Regex TablePattern = new Regex(
-            @"(?:FROM|JOIN)\s+(\[?[\w.]+\]?)(?:\s+(?:AS\s+)?(\w+))?",
+            @"(?:FROM|JOIN|UPDATE|DELETE\s+FROM|INTO)\s+(\[?[\w.]+\]?)(?:\s+(?:AS\s+)?(\w+))?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
@@ -129,9 +129,15 @@ namespace DBTool.Commons
 
     /// <summary>
     /// AvalonEdit colorizer that highlights column names that belong to detected tables.
+    /// Handles both bare column names and alias.column patterns (e.g. S.STYLEID).
     /// </summary>
     public class SqlColumnColorizer : DocumentColorizingTransformer
     {
+        // Matches alias.column (e.g. S.STYLEID, SM.STYLEMEASID)
+        private static readonly Regex AliasColumnPattern = new Regex(
+            @"\b(\w+)\.(\w+)\b", RegexOptions.Compiled);
+
+        // Matches standalone words
         private static readonly Regex WordPattern = new Regex(
             @"\b(\w+)\b", RegexOptions.Compiled);
 
@@ -152,27 +158,77 @@ namespace DBTool.Commons
         };
 
         private readonly SolidColorBrush _validColumnBrush = new SolidColorBrush(
-            (Color)ColorConverter.ConvertFromString("#2E7D32")); // green
+            (Color)ColorConverter.ConvertFromString("#2E7D32"));
+
+        // Cache to avoid re-parsing on every line
+        private string _cachedText;
+        private Dictionary<string, string> _cachedTables;
+        private HashSet<string> _cachedAllColumns;
+
+        private void RefreshCache(string fullText)
+        {
+            if (fullText == _cachedText) return;
+
+            _cachedText = fullText;
+            _cachedTables = SqlTableParser.ExtractTables(fullText);
+            _cachedAllColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var kvp in _cachedTables)
+            {
+                var cols = SchemaStore.GetColumnsForTable(kvp.Value);
+                if (cols != null)
+                    foreach (var c in cols) _cachedAllColumns.Add(c);
+            }
+        }
 
         protected override void ColorizeLine(DocumentLine line)
         {
             string fullText = CurrentContext.Document.Text;
-            var validColumns = SqlTableParser.GetValidColumns(fullText);
+            RefreshCache(fullText);
 
-            if (validColumns.Count == 0) return;
+            if (_cachedTables == null || _cachedTables.Count == 0) return;
+            if (_cachedAllColumns == null || _cachedAllColumns.Count == 0) return;
 
             int lineStart = line.Offset;
             string lineText = CurrentContext.Document.GetText(line);
 
+            // First pass: handle alias.column patterns
+            var handledRanges = new HashSet<int>();
+
+            foreach (Match match in AliasColumnPattern.Matches(lineText))
+            {
+                string prefix = match.Groups[1].Value;
+                string column = match.Groups[2].Value;
+
+                if (_cachedTables.TryGetValue(prefix, out string actualTable))
+                {
+                    var tableCols = SchemaStore.GetColumnsForTable(actualTable);
+                    if (tableCols != null && tableCols.Contains(column))
+                    {
+                        int colStart = lineStart + match.Groups[2].Index;
+                        int colEnd = colStart + column.Length;
+
+                        ChangeLinePart(colStart, colEnd, element =>
+                        {
+                            element.TextRunProperties.SetForegroundBrush(_validColumnBrush);
+                        });
+                    }
+
+                    for (int i = match.Index; i < match.Index + match.Length; i++)
+                        handledRanges.Add(i);
+                }
+            }
+
+            // Second pass: bare column names
             foreach (Match match in WordPattern.Matches(lineText))
             {
+                if (handledRanges.Contains(match.Index)) continue;
+
                 string word = match.Value;
-
-                // Skip SQL keywords and table names
                 if (SqlKeywords.Contains(word)) continue;
+                if (_cachedTables.ContainsKey(word)) continue;
 
-                // Check if this word is a valid column
-                if (validColumns.Contains(word))
+                if (_cachedAllColumns.Contains(word))
                 {
                     int start = lineStart + match.Index;
                     int end = start + match.Length;

@@ -201,6 +201,10 @@ namespace DBTool.Controls
             requestQuery.Query = query;
             listViewResultControl.SetTag((this.DataContext as RegionTenant).tenantId);
 
+            // Save to query history
+            var rt = this.DataContext as RegionTenant;
+            QueryHistory.Add(query, rt?.tenantId);
+
             currentList._timer.IsEnabled = true;
             currentList._timer.Start();
             currentList._stopwatch.Restart();

@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.CodeCompletion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,6 +83,64 @@ namespace DBTool.Controls
             // Add SQL column highlighter
             var columnColorizer = new DBTool.Commons.SqlColumnColorizer();
             txtQuery.TextArea.TextView.LineTransformers.Add(columnColorizer);
+
+            // Setup autocomplete
+            txtQuery.TextArea.TextEntered += TextArea_TextEntered;
+        }
+
+        private CompletionWindow _completionWindow;
+
+        private void TextArea_TextEntered(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            if (e.Text == ".")
+            {
+                // Alias dot completion — only if prefix is a known alias
+                int offset = txtQuery.CaretOffset - 2;
+                if (offset >= 0)
+                {
+                    string text = txtQuery.Text;
+                    int start = offset;
+                    while (start > 0 && char.IsLetterOrDigit(text[start - 1]))
+                        start--;
+                    string prefix = text.Substring(start, offset - start + 1);
+
+                    // Only show completions if prefix is a known alias in the query
+                    var tables = SqlTableParser.ExtractTables(text);
+                    if (tables.ContainsKey(prefix))
+                    {
+                        var completions = SqlCompletionProvider.GetAliasCompletions(prefix, text);
+                        if (completions.Count > 0)
+                            ShowCompletionWindow(completions, txtQuery.CaretOffset);
+                    }
+                }
+            }
+            else if (char.IsLetter(e.Text[0]))
+            {
+                int offset = txtQuery.CaretOffset;
+                string text = txtQuery.Text;
+                int start = offset - 1;
+                while (start > 0 && char.IsLetterOrDigit(text[start - 1]))
+                    start--;
+                string currentWord = text.Substring(start, offset - start);
+
+                if (currentWord.Length >= 2)
+                {
+                    var completions = SqlCompletionProvider.GetCompletions(currentWord, text, offset);
+                    if (completions.Count > 0)
+                        ShowCompletionWindow(completions, start);
+                }
+            }
+        }
+
+        private void ShowCompletionWindow(System.Collections.Generic.List<ICSharpCode.AvalonEdit.CodeCompletion.ICompletionData> completions, int startOffset)
+        {
+            _completionWindow = new CompletionWindow(txtQuery.TextArea);
+            _completionWindow.StartOffset = startOffset;
+            var data = _completionWindow.CompletionList.CompletionData;
+            foreach (var item in completions)
+                data.Add(item);
+            _completionWindow.Show();
+            _completionWindow.Closed += (s, args) => _completionWindow = null;
         }
 
         private void AddTextboxQueryContextMenu()
@@ -89,8 +148,10 @@ namespace DBTool.Controls
             var cmInsertQuery = new MenuItem { Header = "Insert Query" };
             var cmSaveQuery = new MenuItem { Header = "Save Query" };
             var cmLogQuery = new MenuItem { Header = "Log Query" };
+            var cmHistory = new MenuItem { Header = "Query History" };
             cmSaveQuery.Click += CmSaveQuery_Click;
             cmLogQuery.Click += CmLogQuery_Click;
+            cmHistory.Click += CmHistory_Click;
 
 
             var cvs = new CollectionViewSource { Source = StaticFunctions.AppConnection.settingsObject.Queries };
@@ -123,6 +184,7 @@ namespace DBTool.Controls
 
             txtQuery.ContextMenu.Items.Add(cmInsertQuery);
             txtQuery.ContextMenu.Items.Add(cmSaveQuery);
+            txtQuery.ContextMenu.Items.Add(cmHistory);
 
 
             if (StaticFunctions.CurrentUser.ToLower() == "cmartin2")
@@ -130,11 +192,129 @@ namespace DBTool.Controls
             
         }
 
+        private void CmHistory_Click(object sender, RoutedEventArgs e)
+        {
+            var rt = this.DataContext as Entities.RegionTenant;
+            var history = QueryHistory.GetForTenant(rt?.tenantId);
+
+            if (history.Count == 0)
+            {
+                ThemedDialog.Show("No query history found.", "Query History");
+                return;
+            }
+
+            var window = new System.Windows.Window
+            {
+                Title = "Query History",
+                Width = 700,
+                Height = 450,
+                WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
+                Owner = System.Windows.Application.Current.MainWindow,
+                WindowStyle = System.Windows.WindowStyle.None,
+                AllowsTransparency = true,
+                Background = System.Windows.Media.Brushes.Transparent,
+                ResizeMode = System.Windows.ResizeMode.NoResize
+            };
+
+            var outerBorder = new System.Windows.Controls.Border
+            {
+                CornerRadius = new System.Windows.CornerRadius(12),
+                Margin = new System.Windows.Thickness(10),
+                Background = (System.Windows.Media.Brush)FindResource("CardBrush"),
+                BorderBrush = (System.Windows.Media.Brush)FindResource("BorderBrush"),
+                BorderThickness = new System.Windows.Thickness(1),
+                Effect = new System.Windows.Media.Effects.DropShadowEffect
+                {
+                    BlurRadius = 20, ShadowDepth = 4, Opacity = 0.15,
+                    Color = System.Windows.Media.Colors.Black
+                }
+            };
+
+            var mainGrid = new System.Windows.Controls.Grid { Margin = new System.Windows.Thickness(16) };
+            mainGrid.RowDefinitions.Add(new System.Windows.Controls.RowDefinition { Height = System.Windows.GridLength.Auto });
+            mainGrid.RowDefinitions.Add(new System.Windows.Controls.RowDefinition { Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star) });
+            mainGrid.RowDefinitions.Add(new System.Windows.Controls.RowDefinition { Height = System.Windows.GridLength.Auto });
+
+            // Title bar
+            var titleBar = new System.Windows.Controls.Grid();
+            var titleText = new System.Windows.Controls.TextBlock
+            {
+                Text = "Query History",
+                FontSize = 15, FontWeight = System.Windows.FontWeights.SemiBold,
+                Foreground = (System.Windows.Media.Brush)FindResource("TextPrimaryBrush"),
+                VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                Margin = new System.Windows.Thickness(0, 0, 0, 12)
+            };
+            var closeBtn = new System.Windows.Controls.Button
+            {
+                Content = "✕", Background = System.Windows.Media.Brushes.Transparent,
+                BorderThickness = new System.Windows.Thickness(0),
+                Foreground = (System.Windows.Media.Brush)FindResource("TextMutedBrush"),
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
+                Cursor = System.Windows.Input.Cursors.Hand,
+                Margin = new System.Windows.Thickness(0, 0, 0, 12)
+            };
+            closeBtn.Click += (s, args) => window.Close();
+            titleBar.Children.Add(titleText);
+            titleBar.Children.Add(closeBtn);
+            System.Windows.Controls.Grid.SetRow(titleBar, 0);
+            mainGrid.Children.Add(titleBar);
+
+            var listBox = new System.Windows.Controls.ListBox
+            {
+                FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+                FontSize = 11,
+                Background = (System.Windows.Media.Brush)FindResource("SurfaceBrush"),
+                Foreground = (System.Windows.Media.Brush)FindResource("TextPrimaryBrush"),
+                BorderBrush = (System.Windows.Media.Brush)FindResource("BorderBrush"),
+                BorderThickness = new System.Windows.Thickness(1)
+            };
+
+            foreach (var entry in history)
+            {
+                var display = $"[{entry.DateExecuted}] {entry.TenantId}\n{(entry.Query.Length > 100 ? entry.Query.Substring(0, 100) + "..." : entry.Query)}";
+                listBox.Items.Add(new System.Windows.Controls.ListBoxItem { Content = display, Tag = entry.Query });
+            }
+
+            System.Windows.Controls.Grid.SetRow(listBox, 1);
+            mainGrid.Children.Add(listBox);
+
+            var btnInsert = new System.Windows.Controls.Button
+            {
+                Content = "Insert Selected",
+                Style = (System.Windows.Style)FindResource("RoundButton"),
+                Margin = new System.Windows.Thickness(0, 12, 0, 0),
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Right
+            };
+
+            btnInsert.Click += (s, args) =>
+            {
+                var selected = listBox.SelectedItem as System.Windows.Controls.ListBoxItem;
+                if (selected != null)
+                {
+                    txtQuery.Text = selected.Tag.ToString();
+                    window.Close();
+                }
+            };
+
+            System.Windows.Controls.Grid.SetRow(btnInsert, 2);
+            mainGrid.Children.Add(btnInsert);
+
+            outerBorder.Child = mainGrid;
+            window.Content = outerBorder;
+            window.MouseLeftButtonDown += (s, args) => { try { window.DragMove(); } catch { } };
+            window.ShowDialog();
+        }
+
         private void CmLogQuery_Click(object sender, RoutedEventArgs e)
         {
+            RegionTenant selectedRegionTenant = this.DataContext as RegionTenant;
+            if (selectedRegionTenant == null) return;
+
             if (!string.IsNullOrWhiteSpace(txtQuery.Text))
             {
-                var queryLog = new LogQueryControl(txtQuery.Text);
+                
+                var queryLog = new LogQueryControl(selectedRegionTenant.tenantId, txtQuery.Text);
               //  Entities.Query newQuery = new Entities.Query();
 
              //   newQuery.QueryString = txtQuery.Text;
@@ -154,10 +334,25 @@ namespace DBTool.Controls
         {
             if (e.Key == Key.F5)
             {
-                // Execute the command
-               RaiseEvent(new RoutedEventArgs(ExecuteEvent));
-                e.Handled = true; // prevent further bubbling
+                RaiseEvent(new RoutedEventArgs(ExecuteEvent));
+                e.Handled = true;
             }
+            else if (e.Key == Key.F && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+            {
+                FormatSql();
+                e.Handled = true;
+            }
+        }
+
+        private void btnFormat_Click(object sender, RoutedEventArgs e)
+        {
+            FormatSql();
+        }
+
+        private void FormatSql()
+        {
+            string formatted = SqlFormatter.Format(txtQuery.Text);
+            txtQuery.Text = formatted;
         }
 
         private void MyRichTextBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)

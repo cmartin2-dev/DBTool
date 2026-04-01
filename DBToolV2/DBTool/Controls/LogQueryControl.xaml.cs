@@ -25,11 +25,12 @@ namespace DBTool.Controls
     public partial class LogQueryControl : Window
     {
         QueryLogProcess queryLogProcess = null;
-        public LogQueryControl(string query)
+        public LogQueryControl(string tenantId, string query)
         {
             InitializeComponent();
             QueryLog queryLog = new QueryLog();
             queryLog.Script = query;
+            queryLog.TenantId = tenantId;
 
             this.DataContext = queryLog;
         }

@@ -41,8 +41,14 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <CheckBox x:Name="chkSCAH" Content="SCAH" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="4"/>
-                <Button x:Name="btnExtract" Content="Extract All results" Grid.Row="0" Grid.Column="1"
-                        HorizontalAlignment="Left" Margin="4" Style="{StaticResource RoundButton}" Click="btnExtract_Click"/>
+                <CheckBox x:Name="chkSelectAllSchemas" Content="Select All Schemas" Grid.Row="0" Grid.Column="1" 
+                          VerticalAlignment="Center" Margin="4" Checked="chkSelectAllSchemas_Checked" Unchecked="chkSelectAllSchemas_Unchecked"/>
+                <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
+                    <Button x:Name="btnExtract" Content="Extract (Multi-Sheet)"
+                            HorizontalAlignment="Left" Margin="4" Style="{StaticResource RoundButton}" Click="btnExtract_Click"/>
+                    <Button x:Name="btnExtractReport" Content="Extract Report (Single Sheet)"
+                            HorizontalAlignment="Left" Margin="4" Style="{StaticResource RoundButton}" Click="btnExtractReport_Click"/>
+                </StackPanel>
                 <local:TxtQueryControl x:Name="txtQueryControl" Grid.Row="1" Grid.Column="0"
                                        Execute="txtQueryControl_Execute" Grid.ColumnSpan="3"/>
             </Grid>

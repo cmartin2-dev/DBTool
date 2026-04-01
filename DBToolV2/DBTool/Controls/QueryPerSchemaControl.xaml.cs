@@ -194,6 +194,142 @@ namespace DBTool.Controls
 
 
 
+        private void chkSelectAllSchemas_Checked(object sender, RoutedEventArgs e)
+        {
+            SelectAllSchemasInAllTabs(true);
+        }
+
+        private void chkSelectAllSchemas_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SelectAllSchemasInAllTabs(false);
+        }
+
+        private void SelectAllSchemasInAllTabs(bool select)
+        {
+            if (schemaTab.Items == null) return;
+
+            foreach (var item in schemaTab.Items)
+            {
+                if (item is TabItem tabItem && tabItem.Content is QueryPerSchemaChildTabControl child)
+                {
+                    // Select/deselect all schemas in this tenant's grid
+                    foreach (var gridItem in child.lstResult.dataGrid1.Items)
+                    {
+                        if (gridItem is IDictionary<string, object> dictItem)
+                        {
+                            dictItem["IsSelected"] = select ? 1 : 0;
+                            string schema = dictItem.ContainsKey("SCHEMANAME") ? dictItem["SCHEMANAME"]?.ToString() : null;
+                            if (!string.IsNullOrEmpty(schema))
+                            {
+                                if (select && !child.SelectedSchemas.Contains(schema))
+                                    child.SelectedSchemas.Add(schema);
+                                else if (!select)
+                                    child.SelectedSchemas.Remove(schema);
+                            }
+                        }
+                    }
+                    child.lstResult.dataGrid1.Items.Refresh();
+                }
+            }
+        }
+
+        private void btnExtractReport_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (tabResult == null || tabResult.Items == null || tabResult.Items.Count == 0)
+                {
+                    ThemedDialog.Show("No results to export.", "Export");
+                    return;
+                }
+
+                var saveDialog = new Microsoft.Win32.SaveFileDialog
+                {
+                    Filter = "Excel File|*.xlsx",
+                    FileName = $"QueryReport_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                };
+
+                if (saveDialog.ShowDialog() != true) return;
+
+                using (var workbook = new ClosedXML.Excel.XLWorkbook())
+                {
+                    var ws = workbook.Worksheets.Add("Report");
+                    int currentRow = 1;
+                    bool headerWritten = false;
+                    int headerColOffset = 2; // Tenant + Schema columns
+
+                    foreach (var item in tabResult.Items)
+                    {
+                        if (item is TabItem maintab && maintab.Content is TabControl tabControl1)
+                        {
+                            string tenantName = maintab.Header?.ToString() ?? "";
+
+                            foreach (TabItem schemaTab in tabControl1.Items)
+                            {
+                                string schemaName = schemaTab.Header?.ToString() ?? "";
+
+                                if (schemaTab.Content is QueryPerSchemaChildTabLstResultControl schemaControl)
+                                {
+                                    var grid = schemaControl.lstViewResult.dataGrid1;
+                                    string json = Utilities.ExportToJson(grid);
+                                    var dt = Utilities.JsonToDataTable(json);
+
+                                    if (dt == null || dt.Rows.Count == 0) continue;
+
+                                    // Write header row once
+                                    if (!headerWritten)
+                                    {
+                                        ws.Cell(currentRow, 1).Value = "Tenant";
+                                        ws.Cell(currentRow, 2).Value = "Schema";
+                                        for (int c = 0; c < dt.Columns.Count; c++)
+                                        {
+                                            ws.Cell(currentRow, c + headerColOffset + 1).Value = dt.Columns[c].ColumnName;
+                                        }
+
+                                        // Style header
+                                        var headerRange = ws.Range(currentRow, 1, currentRow, dt.Columns.Count + headerColOffset);
+                                        headerRange.Style.Font.Bold = true;
+                                        headerRange.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromHtml("#1F2937");
+                                        headerRange.Style.Font.FontColor = ClosedXML.Excel.XLColor.White;
+
+                                        currentRow++;
+                                        headerWritten = true;
+                                    }
+
+                                    // Write data rows
+                                    foreach (System.Data.DataRow row in dt.Rows)
+                                    {
+                                        ws.Cell(currentRow, 1).Value = tenantName;
+                                        ws.Cell(currentRow, 2).Value = schemaName;
+                                        for (int c = 0; c < dt.Columns.Count; c++)
+                                        {
+                                            ws.Cell(currentRow, c + headerColOffset + 1).Value = row[c]?.ToString() ?? "";
+                                        }
+                                        currentRow++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Auto-fit columns
+                    ws.Columns().AdjustToContents();
+
+                    // Add filters
+                    if (currentRow > 2)
+                        ws.Range(1, 1, currentRow - 1, ws.LastColumnUsed().ColumnNumber()).SetAutoFilter();
+
+                    workbook.SaveAs(saveDialog.FileName);
+                }
+
+                ThemedDialog.Show("Report exported successfully.", "Export");
+            }
+            catch (Exception ex)
+            {
+                ThemedDialog.Show($"Export failed: {ex.Message}", "Error");
+            }
+        }
+
         private void btnExtract_Click(object sender, RoutedEventArgs e)
         {
 

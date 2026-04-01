@@ -58,6 +58,7 @@
                         <DataGridTextColumn Header="Schema" Binding="{Binding SchemaName}" Width="80"/>
                         <DataGridTextColumn Header="Changeset" Binding="{Binding ChangesetId}" Width="200"/>
                         <DataGridTextColumn Header="Description" Binding="{Binding Comment}" Width="*"/>
+                        <DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="200"/>
                         <DataGridTextColumn Header="User" Binding="{Binding ExecutedBy}" Width="80"/>
                     </DataGrid.Columns>
                 </DataGrid>
