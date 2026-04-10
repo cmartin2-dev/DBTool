@@ -76,6 +76,13 @@ namespace DBTool.Commons
 
             if (isTableContext)
             {
+                // Suggest schema names (e.g. SCAH, FSH)
+                foreach (var schema in SchemaStore.SchemaToTables.Keys)
+                {
+                    if (schema.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))
+                        results.Add(new SqlCompletionData(schema, "Schema"));
+                }
+
                 // Only suggest table names
                 foreach (var table in SchemaStore.TableColumns.Keys)
                 {
@@ -105,9 +112,15 @@ namespace DBTool.Commons
                         results.Add(new SqlCompletionData(col, "Column"));
                 }
 
-                // Also suggest table names if no tables detected yet
+                // Also suggest schema names and table names if no tables detected yet
                 if (queryTables.Count == 0)
                 {
+                    foreach (var schema in SchemaStore.SchemaToTables.Keys)
+                    {
+                        if (schema.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))
+                            results.Add(new SqlCompletionData(schema, "Schema"));
+                    }
+
                     foreach (var table in SchemaStore.TableColumns.Keys)
                     {
                         if (table.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))

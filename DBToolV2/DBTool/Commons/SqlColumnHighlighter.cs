@@ -13,12 +13,14 @@ namespace DBTool.Commons
     public class TableSchema
     {
         public string table { get; set; }
+        public string schema { get; set; }
         public List<string> columns { get; set; }
     }
 
     public class SchemaStore
     {
         private static Dictionary<string, HashSet<string>> _tableColumns;
+        private static Dictionary<string, List<string>> _schemaToTables;
         private static readonly string SchemaFile = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory, "schema.json");
 
@@ -31,9 +33,20 @@ namespace DBTool.Commons
             }
         }
 
+        public static Dictionary<string, List<string>> SchemaToTables
+        {
+            get
+            {
+                if (_schemaToTables == null) Load();
+                return _schemaToTables;
+            }
+        }
+
         public static void Load()
         {
             _tableColumns = new Dictionary<string, HashSet<string>>(
+                StringComparer.OrdinalIgnoreCase);
+            _schemaToTables = new Dictionary<string, List<string>>(
                 StringComparer.OrdinalIgnoreCase);
             try
             {
@@ -49,6 +62,14 @@ namespace DBTool.Commons
                             {
                                 _tableColumns[s.table] = new HashSet<string>(
                                     s.columns, StringComparer.OrdinalIgnoreCase);
+
+                                // Build schema-to-tables mapping
+                                if (!string.IsNullOrEmpty(s.schema))
+                                {
+                                    if (!_schemaToTables.ContainsKey(s.schema))
+                                        _schemaToTables[s.schema] = new List<string>();
+                                    _schemaToTables[s.schema].Add(s.table);
+                                }
                             }
                         }
                     }
@@ -69,6 +90,20 @@ namespace DBTool.Commons
                 return cols;
             return null;
         }
+
+        public static List<string> GetTablesForSchema(string schemaPrefix)
+        {
+            // Try exact match first (e.g. "SCAH")
+            if (SchemaToTables.TryGetValue(schemaPrefix, out var tables))
+                return tables;
+
+            // Try stripping numeric suffix (e.g. "FSH1" -> "FSH", "FSH603" -> "FSH")
+            var stripped = new string(schemaPrefix.TakeWhile(c => char.IsLetter(c)).ToArray());
+            if (!string.IsNullOrEmpty(stripped) && SchemaToTables.TryGetValue(stripped, out var tables2))
+                return tables2;
+
+            return null;
+        }
     }
 
     /// <summary>
@@ -77,11 +112,15 @@ namespace DBTool.Commons
     public static class SqlTableParser
     {
         private static readonly Regex TablePattern = new Regex(
-            @"(?:FROM|JOIN|UPDATE|DELETE\s+FROM|INTO)\s+(\[?[\w.]+\]?)(?:\s+(?:AS\s+)?(\w+))?",
+            @"(?:FROM|JOIN|UPDATE|DELETE\s+FROM|INTO)\s+(\[?\w+(?:\.\w+)?\]?)(?:\s+(?:AS\s+)?(\w+))?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
-        /// Returns a dictionary of alias/tableName -> actual table name
+        /// Returns a dictionary of alias/tableName -> actual table name (schema-stripped).
+        /// e.g. "FROM SCAH.DATASCHEMAS DS" produces:
+        ///   "SCAH.DATASCHEMAS" -> "DATASCHEMAS"
+        ///   "DATASCHEMAS"      -> "DATASCHEMAS"
+        ///   "DS"               -> "DATASCHEMAS"
         /// </summary>
         public static Dictionary<string, string> ExtractTables(string sql)
         {
@@ -90,16 +129,26 @@ namespace DBTool.Commons
 
             foreach (Match match in TablePattern.Matches(sql))
             {
-                string tableName = match.Groups[1].Value.Trim('[', ']');
+                string rawName = match.Groups[1].Value.Trim('[', ']');
                 string alias = match.Groups[2].Success ? match.Groups[2].Value : null;
 
-                // Store by actual table name
-                if (!tables.ContainsKey(tableName))
-                    tables[tableName] = tableName;
+                // Strip schema prefix: SCAH.DATASCHEMAS -> DATASCHEMAS
+                string bareName = rawName;
+                int dotIdx = rawName.LastIndexOf('.');
+                if (dotIdx >= 0)
+                    bareName = rawName.Substring(dotIdx + 1);
+
+                // Store by full qualified name -> bare name
+                if (!tables.ContainsKey(rawName))
+                    tables[rawName] = bareName;
+
+                // Store by bare table name
+                if (!tables.ContainsKey(bareName))
+                    tables[bareName] = bareName;
 
                 // Store by alias
                 if (!string.IsNullOrEmpty(alias) && !tables.ContainsKey(alias))
-                    tables[alias] = tableName;
+                    tables[alias] = bareName;
             }
 
             return tables;

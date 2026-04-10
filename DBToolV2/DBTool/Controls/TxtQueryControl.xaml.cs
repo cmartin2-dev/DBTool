@@ -92,9 +92,18 @@ namespace DBTool.Controls
 
         private void TextArea_TextEntered(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
+            // Close completion on space, comma, semicolon, etc.
+            if (e.Text == " " || e.Text == "," || e.Text == ";" || e.Text == "(" || e.Text == ")")
+            {
+                _completionWindow?.Close();
+                return;
+            }
+
             if (e.Text == ".")
             {
-                // Alias dot completion — only if prefix is a known alias
+                _completionWindow?.Close();
+                _completionWindow = null;
+
                 int offset = txtQuery.CaretOffset - 2;
                 if (offset >= 0)
                 {
@@ -104,13 +113,35 @@ namespace DBTool.Controls
                         start--;
                     string prefix = text.Substring(start, offset - start + 1);
 
-                    // Only show completions if prefix is a known alias in the query
                     var tables = SqlTableParser.ExtractTables(text);
+
                     if (tables.ContainsKey(prefix))
                     {
+                        // Known alias — show columns for that alias's table
                         var completions = SqlCompletionProvider.GetAliasCompletions(prefix, text);
                         if (completions.Count > 0)
                             ShowCompletionWindow(completions, txtQuery.CaretOffset);
+                    }
+                    else
+                    {
+                        // Not a known alias — likely a schema prefix, show tables for that schema
+                        var schemaTables = SchemaStore.GetTablesForSchema(prefix);
+                        var tableCompletions = new System.Collections.Generic.List<ICSharpCode.AvalonEdit.CodeCompletion.ICompletionData>();
+
+                        if (schemaTables != null)
+                        {
+                            foreach (var table in schemaTables)
+                                tableCompletions.Add(new SqlCompletionData(table, "Table"));
+                        }
+                        else
+                        {
+                            // Fallback: show all tables
+                            foreach (var table in SchemaStore.TableColumns.Keys)
+                                tableCompletions.Add(new SqlCompletionData(table, "Table"));
+                        }
+
+                        if (tableCompletions.Count > 0)
+                            ShowCompletionWindow(tableCompletions, txtQuery.CaretOffset);
                     }
                 }
             }
@@ -123,7 +154,56 @@ namespace DBTool.Controls
                     start--;
                 string currentWord = text.Substring(start, offset - start);
 
-                if (currentWord.Length >= 2)
+                // Check if we're typing after a dot (schema.table context)
+                bool afterDot = start > 0 && text[start - 1] == '.';
+
+                if (afterDot)
+                {
+                    // Get the prefix before the dot
+                    int prefixEnd = start - 2;
+                    int prefixStart = prefixEnd;
+                    while (prefixStart > 0 && char.IsLetterOrDigit(text[prefixStart - 1]))
+                        prefixStart--;
+                    string prefix = text.Substring(prefixStart, prefixEnd - prefixStart + 1);
+
+                    var tables = SqlTableParser.ExtractTables(text);
+                    if (tables.ContainsKey(prefix))
+                    {
+                        // Known alias — show columns
+                        var completions = SqlCompletionProvider.GetAliasCompletions(prefix, text);
+                        var filtered = completions.Where(c => c.Text.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase)).ToList();
+                        if (filtered.Count > 0)
+                            ShowCompletionWindow(filtered, start);
+                    }
+                    else
+                    {
+                        // Schema prefix — show only tables for that schema
+                        var schemaTables = SchemaStore.GetTablesForSchema(prefix);
+                        var tableCompletions = new System.Collections.Generic.List<ICSharpCode.AvalonEdit.CodeCompletion.ICompletionData>();
+
+                        if (schemaTables != null)
+                        {
+                            foreach (var table in schemaTables)
+                            {
+                                if (table.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))
+                                    tableCompletions.Add(new SqlCompletionData(table, "Table"));
+                            }
+                        }
+                        else
+                        {
+                            // Fallback: show all tables
+                            foreach (var table in SchemaStore.TableColumns.Keys)
+                            {
+                                if (table.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))
+                                    tableCompletions.Add(new SqlCompletionData(table, "Table"));
+                            }
+                        }
+
+                        if (tableCompletions.Count > 0)
+                            ShowCompletionWindow(tableCompletions, start);
+                    }
+                }
+                else if (currentWord.Length >= 2)
                 {
                     var completions = SqlCompletionProvider.GetCompletions(currentWord, text, offset);
                     if (completions.Count > 0)
@@ -134,6 +214,9 @@ namespace DBTool.Controls
 
         private void ShowCompletionWindow(System.Collections.Generic.List<ICSharpCode.AvalonEdit.CodeCompletion.ICompletionData> completions, int startOffset)
         {
+            if (completions == null || completions.Count == 0) return;
+            if (_completionWindow != null) return;
+
             _completionWindow = new CompletionWindow(txtQuery.TextArea);
             _completionWindow.StartOffset = startOffset;
             var data = _completionWindow.CompletionList.CompletionData;
