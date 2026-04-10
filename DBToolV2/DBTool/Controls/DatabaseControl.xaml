@@ -27,6 +27,9 @@
             <TabItem Header="Compress FDB" Style="{StaticResource BaseTabItem}">
                 <local:CompressFdbControl x:Name="compressFdbControl"/>
             </TabItem>
+            <TabItem Header="New Version" Style="{StaticResource BaseTabItem}">
+                <local:NewVersionControl x:Name="newVersionControl"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

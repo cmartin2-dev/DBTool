@@ -1,0 +1,63 @@
+<UserControl x:Class="DBTool.Controls.NewVersionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: Browse + Root Folder + New Version + Base Version -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Browse" Style="{StaticResource RoundButton}" Click="BrowseFolder_Click"/>
+            <TextBox x:Name="txtRootFolder" Width="250" IsReadOnly="True" VerticalContentAlignment="Center" Margin="8,0,8,0"/>
+
+            <TextBlock Text="New Version:" VerticalAlignment="Center" Margin="8,0,8,0"
+                       Foreground="{DynamicResource TextMutedBrush}" FontFamily="{StaticResource AppFont}"/>
+            <TextBox x:Name="txtNewVersion" Width="120" VerticalContentAlignment="Center" Margin="0,0,8,0"/>
+
+            <TextBlock Text="Base Version:" VerticalAlignment="Center" Margin="8,0,8,0"
+                       Foreground="{DynamicResource TextMutedBrush}" FontFamily="{StaticResource AppFont}"/>
+            <ComboBox x:Name="cboBaseVersion" Width="140"/>
+        </StackPanel>
+
+        <!-- Row 1: UPGRADE Template Folder -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="UPGRADE Template Folder:" VerticalAlignment="Center" Margin="0,0,8,0"
+                       Foreground="{DynamicResource TextMutedBrush}" FontFamily="{StaticResource AppFont}"/>
+            <TextBox x:Name="txtTemplateFolder" Width="400" IsReadOnly="True" VerticalContentAlignment="Center" Margin="0,0,8,0"/>
+            <Button Content="Browse" Style="{StaticResource RoundButton}" Click="BrowseTemplate_Click"/>
+            <Button Content="Preview" Style="{StaticResource RoundButton}" Click="ScaffoldPreview_Click" Margin="8,0,0,0"/>
+        </StackPanel>
+
+        <!-- Row 2: Summary -->
+        <Border Grid.Row="2" Style="{StaticResource grayBorders}" Padding="10" Margin="0,0,0,8">
+            <TextBlock x:Name="txtSummary" Text="Select a root folder, base version, and template folder, then click Preview." TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextSecondaryBrush}" FontFamily="{StaticResource AppFont}" FontSize="12"/>
+        </Border>
+
+        <!-- Row 3: DataGrid -->
+        <DataGrid Grid.Row="3" x:Name="dgScaffoldItems" AutoGenerateColumns="False" IsReadOnly="True"
+                  CanUserSortColumns="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                  BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}"
+                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="80"/>
+                <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*"/>
+                <DataGridTextColumn Header="Destination" Binding="{Binding Destination}" Width="*"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Row 4: Create Version button -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button Content="Create Version" Style="{StaticResource RoundButton}" Click="ScaffoldCreate_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
