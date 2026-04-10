@@ -15,6 +15,18 @@
             <TabItem Header="ERD" Style="{StaticResource BaseTabItem}">
                 <local:ErdControl x:Name="erdControl"/>
             </TabItem>
+            <TabItem Header="Consistency Check" Style="{StaticResource BaseTabItem}">
+                <local:ConsistencyCheckControl x:Name="consistencyCheckControl"/>
+            </TabItem>
+            <TabItem Header="Compare Versions" Style="{StaticResource BaseTabItem}">
+                <local:CompareVersionsControl x:Name="compareVersionsControl"/>
+            </TabItem>
+            <TabItem Header="Apply Fix" Style="{StaticResource BaseTabItem}">
+                <local:ApplyFixControl x:Name="applyFixControl"/>
+            </TabItem>
+            <TabItem Header="Compress FDB" Style="{StaticResource BaseTabItem}">
+                <local:CompressFdbControl x:Name="compressFdbControl"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

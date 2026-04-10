@@ -1,0 +1,30 @@
+<databaseChangeLog
+   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+<include file="SCAH/SCAH_UPGRADE_TABLES.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPGRADE_FUNCTIONS.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPGRADE_STORED_PROCEDURES.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPGRADE_VIEWS.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPGRADE_META_DATA.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPGRADE_INDEXES.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPGRADE_TRIGGERS.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPGRADE_LAYOUT_METADATA.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPGRADE_ROLE_VIEW.sql"
+         relativeToChangelogFile="true"/>
+<include file="SCAH/SCAH_UPDATE_FEATURE_TOGGLE_EXPIRY.sql"
+         relativeToChangelogFile="true"/>		
+<include file="SCAH/SCAH_UPDATE_FEATURE_TOGGLE_STATUS.sql"
+         relativeToChangelogFile="true"/>			 
+</databaseChangeLog>
+
+

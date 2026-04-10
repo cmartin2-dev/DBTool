@@ -1,0 +1,65 @@
+--liquibase formatted sql
+
+--changeset system:{new_version}.scah.feature_toggle_expiry.001  splitStatements:true endDelimiter:GO runAlways:true
+--param schemaName:string
+--comment: Update feature toggle
+ALTER TABLE [SCAH].[APPFEATURE] DISABLE TRIGGER [APPFEATURE_AUDIT_UPDATE]
+GO
+
+--changeset system:{new_version}.scah.feature_toggle_expiry.002  splitStatements:true endDelimiter:GO runAlways:true
+--param schemaName:string
+--comment: Update feature toggle
+WITH
+DATENAMEMAP AS
+(
+	SELECT *
+	FROM 
+	(
+		VALUES 
+			('Monday', 0), 
+			('Tuesday', 1),
+			('Wednesday', 2),
+			('Thursday', 3),
+			('Friday', 4),
+			('Saturday', 5),
+			('Sunday', 6)
+	) AS DNM (DATENAMESTRING, DATENAMEINT)
+),
+CURRENTDATEDETAILS AS
+(
+	SELECT 
+		(
+			SELECT DNM.DATENAMEINT 
+			FROM DATENAMEMAP DNM
+			WHERE LOWER(DNM.DATENAMESTRING) = LOWER(DATENAME(DW, GETDATE())) 
+		) AS DATENAMEVALUE,
+		(DAY(GETDATE()) + 6) / 7 AS OCCURRENCE
+),
+FEATURESTOUPDATE AS
+(
+		SELECT 
+			AF.APPFEATUREID, 
+			AF.RELEASEEXPIRY,
+			(SELECT TOP 1 CDD.DATENAMEVALUE FROM CURRENTDATEDETAILS CDD) AS DATENAMEVALUE,
+			(SELECT TOP 1 CDD.OCCURRENCE FROM CURRENTDATEDETAILS CDD) AS OCCURENCE,
+			CONCAT(AF.RELEASEEXPIRY, '.01') AS INITIALRELEASEEXPIRY
+		FROM SCAH.APPFEATURE AF
+		WHERE AF.VISIBLE = 1
+			AND AF.EXPIRYDATE IS NULL
+			AND AF.RELEASEEXPIRY IS NOT NULL
+)
+UPDATE AF
+SET EXPIRYDATE = 
+	CASE
+		WHEN SUBSTRING(AF.VERSION, 1, 7) = AF.RELEASEEXPIRY THEN REPLACE(EOMONTH(DATEFROMPARTS(SUBSTRING(AF.RELEASEEXPIRY,1,4), SUBSTRING(AF.RELEASEEXPIRY,6,2), 1)),'-','.')
+		ELSE DATEADD(DAY, (DATEDIFF(DAY, FTU.DATENAMEVALUE,  FTU.INITIALRELEASEEXPIRY) / 7) * 7 + (FTU.OCCURENCE * 7), FTU.DATENAMEVALUE)
+	END
+FROM SCAH.APPFEATURE AF
+INNER JOIN FEATURESTOUPDATE FTU ON AF.APPFEATUREID = FTU.APPFEATUREID
+GO
+
+--changeset system:{new_version}.scah.feature_toggle_expiry.003  splitStatements:true endDelimiter:GO runAlways:true
+--param schemaName:string
+--comment: Update feature toggle
+ALTER TABLE [SCAH].[APPFEATURE] ENABLE TRIGGER [APPFEATURE_AUDIT_UPDATE]
+GO

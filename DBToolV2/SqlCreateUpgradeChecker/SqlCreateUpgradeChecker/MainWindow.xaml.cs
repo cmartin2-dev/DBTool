@@ -73,6 +73,11 @@ public partial class MainWindow : Window
             if (profiles.Count > 0)
                 cboAwsProfile.SelectedIndex = 0;
 
+            // Populate scaffold tab
+            cboBaseVersion.ItemsSource = versions;
+            if (versions.Count > 0)
+                cboBaseVersion.SelectedIndex = versions.Count - 1;
+
             txtSummary.Text = $"Found {versions.Count} versions. Select a version and schema, then click Analyze.";
         }
     }
@@ -786,6 +791,225 @@ public partial class MainWindow : Window
         finally
         {
             Mouse.OverrideCursor = null;
+        }
+    }
+
+    // ===== TAB 5: New Version Scaffold =====
+
+    private List<ScaffoldItem> _scaffoldItems = [];
+
+    private void BrowseTemplate_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new System.Windows.Forms.FolderBrowserDialog
+        {
+            Description = "Select the UPGRADE template folder (containing FSH and/or SCAH subfolders)",
+            ShowNewFolderButton = false
+        };
+
+        if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            txtTemplateFolder.Text = dialog.SelectedPath;
+    }
+
+    private void ScaffoldPreview_Click(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(txtRootFolder.Text))
+        {
+            System.Windows.MessageBox.Show("Please select a root folder first.", "No Folder",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var newVersion = txtNewVersion.Text.Trim();
+        if (string.IsNullOrEmpty(newVersion))
+        {
+            System.Windows.MessageBox.Show("Please enter a new version name.", "No Version",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        if (cboBaseVersion.SelectedItem == null)
+        {
+            System.Windows.MessageBox.Show("Please select a base version.", "No Base Version",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var rootFolder = txtRootFolder.Text;
+        var baseVersion = cboBaseVersion.SelectedItem.ToString()!;
+        var templateFolder = txtTemplateFolder.Text.Trim();
+
+        // Check if version already exists
+        var createNewDir = System.IO.Path.Combine(rootFolder, "CREATE", newVersion);
+        var upgradeNewDir = System.IO.Path.Combine(rootFolder, "UPGRADE", newVersion);
+
+        _scaffoldItems = [];
+
+        // CREATE: copy from base version
+        var createBaseDir = System.IO.Path.Combine(rootFolder, "CREATE", baseVersion);
+        if (System.IO.Directory.Exists(createBaseDir))
+        {
+            foreach (var file in System.IO.Directory.GetFiles(createBaseDir, "*", System.IO.SearchOption.AllDirectories))
+            {
+                var relativePath = file[(createBaseDir.Length + 1)..];
+                _scaffoldItems.Add(new ScaffoldItem
+                {
+                    Action = "Copy",
+                    Source = $"CREATE/{baseVersion}/{relativePath}",
+                    Destination = $"CREATE/{newVersion}/{relativePath}",
+                    Status = System.IO.Directory.Exists(createNewDir) ? "Exists" : "Pending"
+                });
+            }
+        }
+
+        // UPGRADE: copy from template folder
+        if (!string.IsNullOrEmpty(templateFolder) && System.IO.Directory.Exists(templateFolder))
+        {
+            foreach (var file in System.IO.Directory.GetFiles(templateFolder, "*", System.IO.SearchOption.AllDirectories))
+            {
+                var relativePath = file[(templateFolder.Length + 1)..];
+                _scaffoldItems.Add(new ScaffoldItem
+                {
+                    Action = "Template",
+                    Source = $"Template/{relativePath}",
+                    Destination = $"UPGRADE/{newVersion}/{relativePath}",
+                    Status = System.IO.Directory.Exists(upgradeNewDir) ? "Exists" : "Pending"
+                });
+            }
+        }
+
+        dgScaffoldItems.ItemsSource = _scaffoldItems;
+
+        var createCount = _scaffoldItems.Count(i => i.Action == "Copy");
+        var templateCount = _scaffoldItems.Count(i => i.Action == "Template");
+
+        txtScaffoldSummary.Text = $"New version: {newVersion} | Base: {baseVersion} | " +
+                                  $"CREATE files: {createCount} | UPGRADE template files: {templateCount} | " +
+                                  $"Total: {_scaffoldItems.Count}";
+    }
+
+    private void ScaffoldCreate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_scaffoldItems.Count == 0)
+        {
+            System.Windows.MessageBox.Show("Click Preview first to see what will be created.", "No Preview",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var newVersion = txtNewVersion.Text.Trim();
+        var rootFolder = txtRootFolder.Text;
+        var baseVersion = cboBaseVersion.SelectedItem?.ToString() ?? "";
+        var templateFolder = txtTemplateFolder.Text.Trim();
+
+        var createNewDir = System.IO.Path.Combine(rootFolder, "CREATE", newVersion);
+        var upgradeNewDir = System.IO.Path.Combine(rootFolder, "UPGRADE", newVersion);
+
+        if (System.IO.Directory.Exists(createNewDir) || System.IO.Directory.Exists(upgradeNewDir))
+        {
+            var overwrite = System.Windows.MessageBox.Show(
+                $"Version {newVersion} already exists. Overwrite?",
+                "Version Exists", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (overwrite != MessageBoxResult.Yes) return;
+        }
+
+        var confirm = System.Windows.MessageBox.Show(
+            $"Create version {newVersion}?\n\n" +
+            $"CREATE: copy from {baseVersion}\n" +
+            $"UPGRADE: copy from template\n\n" +
+            $"Total files: {_scaffoldItems.Count}",
+            "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+        if (confirm != MessageBoxResult.Yes) return;
+
+        try
+        {
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+            int created = 0;
+
+            // Copy CREATE from base — replace old version references with new
+            var createBaseDir = System.IO.Path.Combine(rootFolder, "CREATE", baseVersion);
+            if (System.IO.Directory.Exists(createBaseDir))
+            {
+                var createReplacements = new Dictionary<string, string>
+                {
+                    { baseVersion, newVersion }
+                };
+                CopyDirectory(createBaseDir, createNewDir, createReplacements);
+                created += _scaffoldItems.Count(i => i.Action == "Copy");
+            }
+
+            // Copy UPGRADE from template — replace {new_version} placeholder
+            if (!string.IsNullOrEmpty(templateFolder) && System.IO.Directory.Exists(templateFolder))
+            {
+                var templateReplacements = new Dictionary<string, string>
+                {
+                    { "{new_version}", newVersion }
+                };
+                CopyDirectory(templateFolder, upgradeNewDir, templateReplacements);
+                created += _scaffoldItems.Count(i => i.Action == "Template");
+            }
+
+            // Update statuses
+            foreach (var item in _scaffoldItems)
+                item.Status = "Created";
+
+            dgScaffoldItems.ItemsSource = null;
+            dgScaffoldItems.ItemsSource = _scaffoldItems;
+
+            System.Windows.MessageBox.Show($"Version {newVersion} created with {created} files.",
+                "Done", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            // Refresh version dropdowns
+            if (_analyzer != null)
+            {
+                var versions = _analyzer.GetVersions();
+                cboVersion.ItemsSource = versions;
+                cboCompareVersionA.ItemsSource = versions;
+                cboCompareVersionB.ItemsSource = versions;
+                cboFixVersion.ItemsSource = versions;
+                cboFdbVersion.ItemsSource = versions;
+                cboBaseVersion.ItemsSource = versions;
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Error creating version:\n{ex.Message}", "Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            Mouse.OverrideCursor = null;
+        }
+    }
+
+    private static void CopyDirectory(string sourceDir, string destDir, Dictionary<string, string>? replacements = null)
+    {
+        System.IO.Directory.CreateDirectory(destDir);
+
+        foreach (var file in System.IO.Directory.GetFiles(sourceDir))
+        {
+            var destFile = System.IO.Path.Combine(destDir, System.IO.Path.GetFileName(file));
+            var ext = System.IO.Path.GetExtension(file).ToLowerInvariant();
+
+            // Only do text replacement on text files
+            if (replacements != null && replacements.Count > 0 &&
+                (ext is ".sql" or ".xml" or ".txt" or ".ddl"))
+            {
+                var content = System.IO.File.ReadAllText(file);
+                foreach (var (oldVal, newVal) in replacements)
+                    content = content.Replace(oldVal, newVal);
+                System.IO.File.WriteAllText(destFile, content);
+            }
+            else
+            {
+                System.IO.File.Copy(file, destFile, true);
+            }
+        }
+
+        foreach (var dir in System.IO.Directory.GetDirectories(sourceDir))
+        {
+            var destSubDir = System.IO.Path.Combine(destDir, System.IO.Path.GetFileName(dir));
+            CopyDirectory(dir, destSubDir, replacements);
         }
     }
 }

@@ -1,0 +1,24 @@
+<databaseChangeLog
+   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">	
+<include file="FSH/FSH_UPGRADE_TABLES.sql"
+         relativeToChangelogFile="true"/>	
+<include file="FSH/FSH_UPGRADE_FUNCTIONS.sql"
+         relativeToChangelogFile="true"/>	
+<include file="FSH/FSH_UPGRADE_VIEWS.sql"
+         relativeToChangelogFile="true"/>	
+<include file="FSH/FSH_UPGRADE_STORED_PROCEDURES.sql"
+         relativeToChangelogFile="true"/>	
+<include file="FSH/FSH_UPGRADE_METADATA.sql"
+         relativeToChangelogFile="true"/>	
+<include file="FSH/FSH_UPGRADE_INDEXES.sql"
+      relativeToChangelogFile="true"/>	
+<include file="FSH/FSH_UPGRADE_CONSTRAINTS.sql"
+         relativeToChangelogFile="true"/>	
+<include file="FSH/FSH_UPGRADE_TRIGGERS.sql"
+         relativeToChangelogFile="true"/>				 
+</databaseChangeLog>
+
+

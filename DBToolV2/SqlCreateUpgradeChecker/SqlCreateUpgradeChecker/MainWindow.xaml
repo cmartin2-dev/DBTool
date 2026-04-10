@@ -323,6 +323,54 @@
                 </Grid>
             </TabItem>
 
+            <!-- TAB 5: New Version Scaffold -->
+            <TabItem Header="New Version" Padding="10,4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,6,0,6">
+                        <Label Content="New Version:"/>
+                        <TextBox x:Name="txtNewVersion" Width="160" VerticalContentAlignment="Center" Margin="4"/>
+                        <Label Content="Base Version (CREATE copy):" Margin="16,0,0,0"/>
+                        <ComboBox x:Name="cboBaseVersion" Width="160"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6">
+                        <Label Content="UPGRADE Template Folder:"/>
+                        <TextBox x:Name="txtTemplateFolder" IsReadOnly="True" Width="500" VerticalContentAlignment="Center" Margin="4"/>
+                        <Button Content="Browse..." Click="BrowseTemplate_Click"/>
+                        <Button Content="Preview" Click="ScaffoldPreview_Click" FontWeight="SemiBold" Margin="16,4,4,4"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="2" Background="#F0F0F0" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                        <TextBlock x:Name="txtScaffoldSummary" Text="Enter a new version name, select a base version, and set the UPGRADE template folder." TextWrapping="Wrap"/>
+                    </Border>
+
+                    <DataGrid Grid.Row="3" x:Name="dgScaffoldItems" AutoGenerateColumns="False" IsReadOnly="True"
+                              AlternatingRowBackground="#F9F9F9"
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column"
+                              VerticalScrollBarVisibility="Auto">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="100"/>
+                            <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*"/>
+                            <DataGridTextColumn Header="Destination" Binding="{Binding Destination}" Width="*"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
+                        <Button Content="Create Version" Click="ScaffoldCreate_Click" FontWeight="SemiBold"
+                                Background="#1976D2" Foreground="White"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
         </TabControl>
     </Grid>
 </Window>
