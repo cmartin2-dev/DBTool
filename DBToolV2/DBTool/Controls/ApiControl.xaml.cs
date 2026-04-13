@@ -1,5 +1,6 @@
 using DBTool.Commons;
 using DBTool.Connect;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entities;
 using Newtonsoft.Json;
 using RestSharp;
@@ -68,6 +69,14 @@ namespace DBTool.Controls
             // Show headers immediately when region is selected
             if (header.Headers != null && header.Headers.Count > 0)
             {
+                //if (region.Headers != null && region.Headers.Count > 0)
+                //{
+                //    foreach (var h in region.Headers)
+                //    {
+                //        if (!header.Headers.ContainsKey(h.Key))
+                //            header.Headers.Add(h.Key, h.Value);
+                //    }
+                //}
                 var headerLines = header.Headers.Select(h => $"{h.Key}: {h.Value}");
                 txtHeaders.Text = string.Join(Environment.NewLine, headerLines);
             }
@@ -319,16 +328,16 @@ namespace DBTool.Controls
                         request.AddStringBody(currentBody, ContentType.Json);
                     }
 
-                    lblStatus.Content = string.IsNullOrEmpty(schemaName) 
-                        ? "Sending..." 
+                    lblStatus.Content = string.IsNullOrEmpty(schemaName)
+                        ? "Sending..."
                         : $"Sending [{schemaName}]...";
 
                     var response = await client.ExecuteAsync(request, _cts.Token);
 
                     lblStatusCode.Content = $"{(int)response.StatusCode} {response.StatusCode}";
                     lblStatusCode.Foreground = response.IsSuccessful
-                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2E7D32"))
-                        : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#C62828"));
+                        ? new SolidColorBrush((System.Windows.Media.Color)ColorConverter.ConvertFromString("#2E7D32"))
+                        : new SolidColorBrush((System.Windows.Media.Color)ColorConverter.ConvertFromString("#C62828"));
 
                     // Update schema status
                     if (currentItem != null)

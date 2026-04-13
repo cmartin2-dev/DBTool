@@ -176,7 +176,7 @@ namespace DBTool.Controls
                             tenantList.ForEach(x =>
                             {
                                 x.Region = item;
-                                var tenant = StaticFunctions.GetTenants().FirstOrDefault(y => y.TenantId == x.tenantId)?.TenantName;
+                                var tenant = StaticFunctions.GetTenants().FirstOrDefault(y => string.Equals(y.TenantId, x.tenantId, StringComparison.OrdinalIgnoreCase))?.TenantName;
                                 x.TenantName = tenant == string.Empty ? "" : tenant;
                             });
 
@@ -306,26 +306,9 @@ namespace DBTool.Controls
             {
                 if (item is RegionTenant regionTenant)
                 {
-                    if (regionTenant.IsSelected != isChecked)
-                    {
-                        regionTenant.IsSelected = isChecked;
-                        if (isChecked)
-                            RunRowCheckedEvent(regionTenant);
-                        else
-                            RunRowUncheckedEvent(regionTenant);
-                    }
+                    regionTenant.IsSelected = isChecked;
                 }
             }
-            //foreach (var item in lstViewEnvironment.Items)
-            //{
-            //    var container = lstViewEnvironment.ItemContainerGenerator.ContainerFromItem(item) as System.Windows.Controls.ListViewItem;
-            //    if (container != null)
-            //    {
-            //        var cb = FindVisualChild<System.Windows.Controls.CheckBox>(container);
-            //        if (cb != null)
-            //            cb.IsChecked = isChecked;
-            //    }
-            //}
             lstResult.dataGrid1.Items.Refresh();
         }
 
